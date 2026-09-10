@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maison Éclair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F3EAD8;
+    --paper-deep: #ECE0C9;
+    --ink: #2B1B14;
+    --ink-soft: #5C4A3E;
+    --wine: #7A2848;
+    --wine-deep: #591C34;
+    --gold: #B8933C;
+    --gold-soft: #D4B876;
+    --hairline: rgba(43, 27, 20, 0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  .serif {
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  section {
+    padding: clamp(70px, 12vw, 140px) clamp(24px, 8vw, 10vw);
+    position: relative;
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before, .hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+  }
+
+  .hero::before {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, var(--gold-soft), transparent 70%);
+    top: -120px; left: -100px;
+  }
+
+  .hero::after {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--wine), transparent 70%);
+    bottom: -180px; right: -120px;
+    opacity: 0.18;
+  }
+
+  .hero .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--wine);
+    margin-bottom: 22px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: rise 1s ease 0.2s forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(52px, 11vw, 108px);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+    animation: rise 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s forwards;
+  }
+
+  .hero .sub {
+    margin-top: 22px;
+    font-size: clamp(15px, 1.6vw, 18px);
+    color: var(--ink-soft);
+    max-width: 46ch;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 1s ease 0.9s forwards;
+  }
+
+  .hero .ornament {
+    margin-top: 40px;
+    width: 1px;
+    height: 60px;
+    background: var(--gold);
+    opacity: 0;
+    animation: growLine 1.2s ease 1.3s forwards;
+  }
+
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes growLine {
+    from { height: 0; opacity: 0; }
+    to { height: 60px; opacity: 0.6; }
+  }
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- story ---------- */
+  .story {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .story .label {
+    font-size: 13px;
+    color: var(--wine);
+    letter-spacing: 0.06em;
+    margin-bottom: 18px;
+  }
+
+  .story h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(28px, 4vw, 38px);
+    line-height: 1.35;
+    color: var(--ink);
+  }
+
+  .story p {
+    margin-top: 24px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- products ---------- */
+  .products-head {
+    text-align: center;
+    max-width: 520px;
+    margin: 0 auto 64px;
+  }
+
+  .products-head .label { font-size: 13px; color: var(--wine); letter-spacing: 0.06em; margin-bottom: 14px; }
+  .products-head h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(32px, 5vw, 46px); }
+
+  .grid {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+  }
+
+  .card {
+    background: var(--paper);
+    padding: 40px 28px;
+    text-align: center;
+    transition: background 0.3s ease;
+  }
+
+  .card:hover { background: var(--paper-deep); }
+
+  .card svg {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 20px;
+    stroke: var(--gold);
+    fill: none;
+    stroke-width: 1.2;
+  }
+
+  .card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .card .price {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--wine);
+    font-size: 17px;
+  }
+
+  /* ---------- quote ---------- */
+  .quote {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .quote blockquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(24px, 3.4vw, 32px);
+    line-height: 1.5;
+    color: var(--wine-deep);
+  }
+
+  .quote cite {
+    display: block;
+    margin-top: 22px;
+    font-style: normal;
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- visit ---------- */
+  .visit {
+    text-align: center;
+  }
+
+  .visit .label { font-size: 13px; color: var(--wine); letter-spacing: 0.06em; margin-bottom: 18px; }
+  .visit h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(30px, 4.5vw, 42px); margin-bottom: 28px; }
+
+  .visit-details {
+    display: flex;
+    justify-content: center;
+    gap: clamp(24px, 6vw, 64px);
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+
+  .visit-details div h4 {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .visit-details div p {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 36px;
+    border: 1px solid var(--wine);
+    color: var(--wine);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  .btn:hover {
+    background: var(--wine);
+    color: var(--paper);
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px 50px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="eyebrow">EST. PARIS · 6E ARRONDISSEMENT</div>
+    <h1 class="serif">Maison Éclair</h1>
+    <p class="sub">Pâtisserie fine, made by hand each morning — where a single bite is meant to be remembered, not just eaten.</p>
+    <div class="ornament"></div>
+  </section>
+
+  <section>
+    <div class="story reveal">
+      <div class="label">OUR STORY</div>
+      <h2>"Pastry is patience made visible — every layer a decision, every glaze a small act of care."</h2>
+      <p>Maison Éclair began in a kitchen no larger than a closet, with one recipe passed down through three generations. Today, the ovens are bigger, but nothing else has changed — no shortcuts, no substitutes, just butter, time, and attention.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="products-head reveal">
+      <div class="label">THE SELECTION</div>
+      <h2 class="serif">Today's favorites</h2>
+    </div>
+    <div class="grid reveal">
+      <div class="card">
+        <svg viewBox="0 0 48 48"><path d="M8 30c4-10 12-16 16-16s12 6 16 16c-6 4-12 6-16 6s-10-2-16-6z"/><path d="M12 30c2-6 6-10 12-10s10 4 12 10"/></svg>
+        <h3>Classic Éclair</h3>
+        <p>Choux pastry, vanilla bean cream, dark chocolate glaze</p>
+        <div class="price">€5.50</div>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="14"/><circle cx="24" cy="24" r="4"/></svg>
+        <h3>Rose Macaron</h3>
+        <p>Almond shell, Damascus rose buttercream</p>
+        <div class="price">€2.80</div>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 48 48"><path d="M10 34h28l-4-18H14z"/><path d="M14 16c2-6 6-10 10-10s8 4 10 10"/></svg>
+        <h3>Tarte au Citron</h3>
+        <p>Meyer lemon curd, torched meringue, shortcrust</p>
+        <div class="price">€6.20</div>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 48 48"><path d="M24 8c-8 6-14 14-14 22a14 14 0 0 0 28 0c0-8-6-16-14-22z"/></svg>
+        <h3>Croissant Amande</h3>
+        <p>Double-baked, almond cream, toasted flakes</p>
+        <div class="price">€3.90</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="quote reveal">
+      <blockquote>"There are bakeries, and then there is Maison Éclair — the kind of place you remember years later, still tasting that first bite."</blockquote>
+      <cite>— Le Petit Gourmet, Paris</cite>
+    </div>
+  </section>
+
+  <section class="visit">
+    <div class="reveal">
+      <div class="label">VISIT US</div>
+      <h2 class="serif">Come, sit a while</h2>
+      <div class="visit-details">
+        <div>
+          <h4>ADDRESS</h4>
+          <p>14 Rue des Amandiers<br>75006 Paris, France</p>
+        </div>
+        <div>
+          <h4>HOURS</h4>
+          <p>Tue – Sun, 7:30am – 6:00pm<br>Closed Mondays</p>
+        </div>
+        <div>
+          <h4>RESERVE</h4>
+          <p>For private tastings<br>and event orders</p>
+        </div>
+      </div>
+      <a href="#" class="btn" onclick="return false;">Book a Tasting</a>
+    </div>
+  </section>
+
+  <footer>Maison Éclair — a design study, not a real bakery</footer>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

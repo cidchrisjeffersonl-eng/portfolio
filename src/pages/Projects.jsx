@@ -6,9 +6,28 @@ export default function Projects() {
       description:
         "Full-stack AI-integrated faculty evaluation platform. Built with React, Node.js/TypeScript, PostgreSQL, and a locally-hosted LLM (Ollama). Features NLP sentiment analysis, thematic categorization, role-based dashboards for 4 user roles, and an AI-assisted intervention system that flags at-risk faculty performance trends.",
       tags: ["React", "Node.js", "TypeScript", "PostgreSQL", "Ollama", "Docker", "Spring Boot"],
-      github: "https://github.com/cidchrisjeffersonl-eng",
+      github: "https://github.com/cidchrisjeffersonl-eng/smart-feedback-analytics",
       demo: null,
       featured: true,
+    },
+    {
+      emoji: "✨",
+      title: "Constellation Studio",
+      description:
+        "An interactive generative art piece — click to place stars, drag between them to draw constellations, with ambient drifting stars and shooting stars streaking through in the background. Built as a canvas/animation showcase, exploring the kind of motion and visual polish used in animated hero sections.",
+      tags: ["JavaScript", "Canvas API", "Animation"],
+      github: null,
+      demo: "/constellation-studio.html",
+    },
+
+    {
+      emoji: "🌼",
+      title: "Maison Eclair",
+      description:
+        "An interactive generative art piece — click to place stars, drag between them to draw constellations, with ambient drifting stars and shooting stars streaking through in the background. Built as a canvas/animation showcase, exploring the kind of motion and visual polish used in animated hero sections.",
+      tags: ["JavaScript", "Canvas API", "Animation"],
+      github: null,
+      demo: "/maison-eclair.html",
     },
     {
       emoji: "☀️",
