@@ -11,6 +11,15 @@ export default function Projects() {
       featured: true,
     },
     {
+      emoji: "☀️",
+      title: "Solar Materials Estimator",
+      description:
+        "Interactive tool that converts a household's monthly electric bill into a ballpark solar system size — panel count, inverter rating, mounting/cabling estimate, and battery sizing for hybrid setups. Built to walk non-technical clients through a real sizing calculation without needing to understand the math behind it.",
+      tags: ["JavaScript", "HTML/CSS", "Solar sizing logic"],
+      github: null,
+      demo: "/solar-estimator.html",
+    },
+    {
       emoji: "🏥",
       title: "Clinic Appointment Booking System",
       description:
@@ -77,19 +86,17 @@ export default function Projects() {
               </div>
               <div className="project-links">
                 {project.github && (
-                  
-                    <a href={project.github}
+                  <a href={project.github}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-primary"
-                    style={{ fontSize: "13px", padding: "8px 16px" }} 
-                    >
+                    style={{ fontSize: "13px", padding: "8px 16px" }}
+                  >
                     GitHub
                   </a>
                 )}
                 {project.demo && (
-                  
-                    <a href={project.demo}
+                  <a href={project.demo}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-accent"

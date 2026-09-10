@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar Materials Estimator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-900: #0F2333;
+    --navy-800: #16324A;
+    --navy-700: #204862;
+    --navy-600: #2B5C7A;
+    --paper: #EDE6D3;
+    --paper-dim: #E1D8C1;
+    --amber: #E8A33D;
+    --amber-bright: #F2B75A;
+    --copper: #B5642F;
+    --text-light: #F3EEDF;
+    --text-dim: #B9C6D1;
+    --text-dark: #1A2A33;
+    --text-dark-dim: #5C6B74;
+    --border-line: rgba(243, 238, 223, 0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--navy-900);
+    color: var(--text-light);
+    min-height: 100vh;
+    padding: clamp(20px, 4vw, 48px);
+    line-height: 1.5;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: clamp(28px, 5vw, 44px);
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-line);
+  }
+
+  header h1 {
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  header p {
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 46ch;
+    margin-top: 6px;
+  }
+
+  .sunmark {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  @media (max-width: 780px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .inputs {
+    background: var(--paper);
+    color: var(--text-dark);
+    padding: 26px;
+  }
+
+  .inputs h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .inputs .sub {
+    font-size: 13px;
+    color: var(--text-dark-dim);
+    margin-bottom: 22px;
+  }
+
+  .field { margin-bottom: 20px; }
+
+  .field label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+
+  .field label .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--copper);
+    font-weight: 600;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--paper-dim);
+    outline: none;
+    -webkit-appearance: none;
+    accent-color: var(--copper);
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--copper);
+    cursor: pointer;
+    border: 2px solid var(--paper);
+  }
+
+  .toggle-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .toggle-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 8px;
+    border: 1.5px solid var(--paper-dim);
+    background: transparent;
+    color: var(--text-dark-dim);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .toggle-btn.active {
+    background: var(--navy-800);
+    color: var(--text-light);
+    border-color: var(--navy-800);
+  }
+
+  select {
+    width: 100%;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13.5px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--paper-dim);
+    background: white;
+    color: var(--text-dark);
+    cursor: pointer;
+  }
+
+  .backup-field { display: none; }
+  .backup-field.show { display: block; }
+
+  .disclaimer-inline {
+    font-size: 11.5px;
+    color: var(--text-dark-dim);
+    line-height: 1.5;
+    padding-top: 16px;
+    border-top: 1px solid var(--paper-dim);
+    margin-top: 4px;
+  }
+
+  .results {
+    background: var(--navy-800);
+    padding: 26px;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(243,238,223,0.035) 0px, rgba(243,238,223,0.035) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, rgba(243,238,223,0.035) 0px, rgba(243,238,223,0.035) 1px, transparent 1px, transparent 32px);
+  }
+
+  .headline-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  @media (max-width: 480px) {
+    .headline-stats { grid-template-columns: 1fr; }
+  }
+
+  .stat {
+    background: var(--navy-700);
+    border-radius: 10px;
+    padding: 16px 16px 14px;
+    border: 1px solid var(--border-line);
+  }
+
+  .stat .label {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .stat .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 600;
+    color: var(--amber-bright);
+    line-height: 1;
+  }
+
+  .stat .unit {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: 4px;
+  }
+
+  .panel-viz {
+    background: var(--navy-900);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-line);
+  }
+
+  .panel-viz .viz-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .panel-viz .viz-label .count {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--amber-bright);
+  }
+
+  .panel-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .cell {
+    width: 16px;
+    height: 11px;
+    background: var(--navy-600);
+    border: 1px solid rgba(232,163,61,0.4);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .cell.on {
+    opacity: 1;
+    transform: scale(1);
+    background: linear-gradient(135deg, var(--amber) 0%, var(--copper) 100%);
+    border-color: var(--amber);
+  }
+
+  .more-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    align-self: center;
+    margin-left: 4px;
+  }
+
+  .breakdown {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border-line);
+    font-size: 13.5px;
+  }
+
+  .line:last-child { border-bottom: none; }
+
+  .line .name { color: var(--text-dim); }
+
+  .line .value {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .cost-box {
+    background: linear-gradient(135deg, var(--copper) 0%, var(--amber) 100%);
+    border-radius: 10px;
+    padding: 18px 20px;
+    color: var(--navy-900);
+  }
+
+  .cost-box .label {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+
+  .cost-box .range {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+  }
+
+  .cost-box .note {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 6px;
+  }
+
+  footer {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  footer strong { color: var(--amber-bright); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Solar materials estimator</h1>
+      <p>A ballpark panel count and equipment list from a monthly electric bill — the kind of quick-read tool a homeowner or business can play with before a real site assessment.</p>
+    </div>
+    <svg class="sunmark" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="10" fill="#E8A33D"/>
+      <g stroke="#E8A33D" stroke-width="2.5" stroke-linecap="round">
+        <line x1="24" y1="2" x2="24" y2="9"/>
+        <line x1="24" y1="39" x2="24" y2="46"/>
+        <line x1="2" y1="24" x2="9" y2="24"/>
+        <line x1="39" y1="24" x2="46" y2="24"/>
+        <line x1="9" y1="9" x2="14" y2="14"/>
+        <line x1="34" y1="34" x2="39" y2="39"/>
+        <line x1="39" y1="9" x2="34" y2="14"/>
+        <line x1="14" y1="34" x2="9" y2="39"/>
+      </g>
+    </svg>
+  </header>
+
+  <div class="grid">
+
+    <!-- INPUTS -->
+    <div class="panel inputs">
+      <h2>Your setup</h2>
+      <div class="sub">Adjust these to see the estimate update.</div>
+
+      <div class="field">
+        <label>Average monthly bill <span class="val" id="billVal">₱6,000</span></label>
+        <input type="range" id="bill" min="1000" max="30000" step="500" value="6000">
+      </div>
+
+      <div class="field">
+        <label>System type</label>
+        <div class="toggle-row">
+          <button class="toggle-btn active" id="btnGrid">Grid-tied</button>
+          <button class="toggle-btn" id="btnHybrid">Hybrid + battery</button>
+        </div>
+      </div>
+
+      <div class="field backup-field" id="backupField">
+        <label>Evening backup wanted <span class="val" id="backupVal">4 hrs</span></label>
+        <input type="range" id="backup" min="2" max="10" step="1" value="4">
+      </div>
+
+      <div class="field">
+        <label>Panel wattage</label>
+        <select id="wattage">
+          <option value="450">450W panels (standard)</option>
+          <option value="550">550W panels (high-output)</option>
+        </select>
+      </div>
+
+      <div class="disclaimer-inline">
+        Estimate only, based on typical Philippine sun-hours and standard system losses. Final sizing, panel layout, and pricing require a real site assessment.
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="panel results">
+
+      <div class="headline-stats">
+        <div class="stat">
+          <div class="label">System size</div>
+          <div class="num"><span id="kwp">0.0</span><span class="unit">kWp</span></div>
+        </div>
+        <div class="stat">
+          <div class="label">Panels needed</div>
+          <div class="num"><span id="panelCount">0</span><span class="unit">pcs</span></div>
+        </div>
+        <div class="stat">
+          <div class="label">Inverter size</div>
+          <div class="num"><span id="inverter">0</span><span class="unit">kW</span></div>
+        </div>
+      </div>
+
+      <div class="panel-viz">
+        <div class="viz-label">
+          <span>Panel layout (illustrative)</span>
+          <span class="count"><span id="vizCount">0</span> panels</span>
+        </div>
+        <div class="panel-grid" id="panelGrid"></div>
+      </div>
+
+      <div class="breakdown">
+        <div class="line"><span class="name">Estimated daily usage</span><span class="value" id="dailyKwh">0 kWh</span></div>
+        <div class="line"><span class="name">Mounting rail (est.)</span><span class="value" id="rail">0 m</span></div>
+        <div class="line"><span class="name">DC cabling (est.)</span><span class="value" id="cable">0 m</span></div>
+        <div class="line" id="batteryLine" style="display:none;"><span class="name">Battery capacity</span><span class="value" id="battery">0 kWh</span></div>
+      </div>
+
+      <div class="cost-box">
+        <div class="label">Estimated equipment + install cost</div>
+        <div class="range" id="costRange">₱0 – ₱0</div>
+        <div class="note">Rough range only — actual quote depends on roof condition, brand tier, and labor.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    Built as a portfolio demo · not a live PHILERGY tool · always confirm with <strong>an actual site visit</strong> before buying anything
+  </footer>
+
+</div>
+
+<script>
+  const billEl = document.getElementById('bill');
+  const billVal = document.getElementById('billVal');
+  const btnGrid = document.getElementById('btnGrid');
+  const btnHybrid = document.getElementById('btnHybrid');
+  const backupField = document.getElementById('backupField');
+  const backupEl = document.getElementById('backup');
+  const backupVal = document.getElementById('backupVal');
+  const wattageEl = document.getElementById('wattage');
+  const batteryLine = document.getElementById('batteryLine');
+  const panelGrid = document.getElementById('panelGrid');
+
+  let systemType = 'grid';
+
+  function fmtPeso(n) {
+    return '₱' + Math.round(n).toLocaleString('en-PH');
+  }
+
+  function animateNumber(el, from, to, decimals) {
+    const duration = 400;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = from + (to - from) * eased;
+      el.textContent = decimals ? val.toFixed(decimals) : Math.round(val).toLocaleString('en-PH');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function buildPanelGrid(count) {
+    panelGrid.innerHTML = '';
+    const cap = 60;
+    const shown = Math.min(count, cap);
+    for (let i = 0; i < shown; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      panelGrid.appendChild(cell);
+      setTimeout(() => cell.classList.add('on'), i * 10);
+    }
+    if (count > cap) {
+      const tag = document.createElement('div');
+      tag.className = 'more-tag';
+      tag.textContent = '+' + (count - cap) + ' more';
+      panelGrid.appendChild(tag);
+    }
+  }
+
+  let prevValues = { kwp: 0, panels: 0, inverter: 0, costLow: 0, costHigh: 0 };
+
+  function calculate() {
+    const bill = parseFloat(billEl.value);
+    const rate = 11.5; // ₱/kWh, blended PH residential average assumption
+    const monthlyKwh = bill / rate;
+    const dailyKwh = monthlyKwh / 30;
+
+    const sunHours = 4.5; // PH average peak sun hours
+    const lossFactor = 0.8; // system losses (inverter, wiring, dirt, temp)
+    const kwp = dailyKwh / (sunHours * lossFactor);
+
+    const wattage = parseFloat(wattageEl.value);
+    const panelCount = Math.ceil((kwp * 1000) / wattage);
+
+    const inverterSizes = [3, 5, 8, 10, 15, 20, 30, 40, 50];
+    const inverter = inverterSizes.find(s => s >= kwp) || inverterSizes[inverterSizes.length - 1];
+
+    const railLength = panelCount * 3.2;
+    const cableLength = panelCount * 10;
+
+    const costLow = kwp * 1000 * 55;
+    const costHigh = kwp * 1000 * 75;
+
+    let batteryKwh = 0;
+    if (systemType === 'hybrid') {
+      const backupHours = parseFloat(backupEl.value);
+      batteryKwh = dailyKwh * (backupHours / 24) * 2; // rough backup sizing with margin
+    }
+
+    // Update headline stats
+    animateNumber(document.getElementById('kwp'), prevValues.kwp, kwp, 1);
+    animateNumber(document.getElementById('panelCount'), prevValues.panels, panelCount, 0);
+    animateNumber(document.getElementById('inverter'), prevValues.inverter, inverter, 0);
+    document.getElementById('vizCount').textContent = panelCount;
+
+    document.getElementById('dailyKwh').textContent = dailyKwh.toFixed(1) + ' kWh';
+    document.getElementById('rail').textContent = railLength.toFixed(0) + ' m';
+    document.getElementById('cable').textContent = cableLength.toFixed(0) + ' m';
+
+    if (systemType === 'hybrid') {
+      batteryLine.style.display = 'flex';
+      document.getElementById('battery').textContent = batteryKwh.toFixed(1) + ' kWh';
+    } else {
+      batteryLine.style.display = 'none';
+    }
+
+    let totalLow = costLow;
+    let totalHigh = costHigh;
+    if (systemType === 'hybrid') {
+      const batteryModules = Math.ceil(batteryKwh / 5);
+      totalLow += batteryModules * 22000;
+      totalHigh += batteryModules * 32000;
+    }
+
+    document.getElementById('costRange').textContent = fmtPeso(totalLow) + ' – ' + fmtPeso(totalHigh);
+
+    buildPanelGrid(panelCount);
+
+    prevValues = { kwp, panels: panelCount, inverter, costLow: totalLow, costHigh: totalHigh };
+  }
+
+  billEl.addEventListener('input', () => {
+    billVal.textContent = fmtPeso(parseFloat(billEl.value));
+    calculate();
+  });
+
+  backupEl.addEventListener('input', () => {
+    backupVal.textContent = backupEl.value + ' hrs';
+    calculate();
+  });
+
+  btnGrid.addEventListener('click', () => {
+    systemType = 'grid';
+    btnGrid.classList.add('active');
+    btnHybrid.classList.remove('active');
+    backupField.classList.remove('show');
+    calculate();
+  });
+
+  btnHybrid.addEventListener('click', () => {
+    systemType = 'hybrid';
+    btnHybrid.classList.add('active');
+    btnGrid.classList.remove('active');
+    backupField.classList.add('show');
+    calculate();
+  });
+
+  wattageEl.addEventListener('change', calculate);
+
+  calculate();
+</script>
+</body>
+</html>
