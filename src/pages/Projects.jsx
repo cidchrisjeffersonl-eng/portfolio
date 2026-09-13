@@ -25,7 +25,7 @@ export default function Projects() {
       title: "Maison Eclair",
       description:
         "An interactive generative art piece — click to place stars, drag between them to draw constellations, with ambient drifting stars and shooting stars streaking through in the background. Built as a canvas/animation showcase, exploring the kind of motion and visual polish used in animated hero sections.",
-      tags: ["JavaScript", "Canvas API", "Animation"],
+      tags: ["HTML/CSS", "Scroll Animation", "Editorial Design"],
       github: null,
       demo: "/maison-eclair.html",
     },
@@ -51,19 +51,19 @@ export default function Projects() {
       emoji: "📋",
       title: "Client Management System (CRM)",
       description:
-        "Web CRM for a local events styling business, replacing manual spreadsheet tracking with a dashboard managing 20+ client records, booking history, and upcoming event views.",
-      tags: ["React", "Node.js", "PostgreSQL"],
+        "Client management dashboard for a fictional events styling studio — searchable client records, a detail drawer with contact info and booking history, and a month-by-month event calendar. Built to demonstrate the same CRM logic used in a real client project, without exposing any private client data.",
+      tags: ["JavaScript", "Dashboard UI", "Data Filtering"],
       github: null,
-      demo: null,
+      demo: "/crm-dashboard-demo.html",
     },
     {
       emoji: "📦",
       title: "Order Management System",
       description:
         "Order tracking system for a small online reseller, automating order status updates and email notifications — eliminating manual follow-up for each transaction.",
-      tags: ["React", "Node.js", "PostgreSQL"],
+      tags: ["JavaScript", "Custom UI", "State Animation"],
       github: null,
-      demo: null,
+      demo: "/order-tracking-demo.html",
     },
   ];
 

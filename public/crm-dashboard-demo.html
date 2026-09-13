@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom & Co. — Client Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --plum-900: #2E1F35;
+    --plum-800: #3D293F;
+    --plum-700: #4C334F;
+    --blush: #F7EFEE;
+    --card: #FFFFFF;
+    --ink: #2B2233;
+    --ink-soft: #8A7C86;
+    --rose: #C97B87;
+    --rose-deep: #A85D6B;
+    --gold: #C9A26B;
+    --green: #7C9885;
+    --line: #EBE2E0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background: var(--blush);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .mn { font-family: 'Manrope', sans-serif; }
+
+  /* ---------- sidebar ---------- */
+  .sidebar {
+    width: 220px;
+    background: var(--plum-900);
+    color: #F0E6EC;
+    flex-shrink: 0;
+    padding: 26px 18px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar .brand {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    margin-bottom: 2px;
+  }
+
+  .sidebar .brand-sub {
+    font-size: 11px;
+    color: #B89DAF;
+    margin-bottom: 32px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #D8C6D3;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .nav-item:hover { background: var(--plum-800); color: white; }
+  .nav-item.active { background: var(--rose); color: white; }
+
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .sidebar-foot {
+    margin-top: auto;
+    font-size: 10.5px;
+    color: #8B7186;
+    line-height: 1.5;
+  }
+
+  /* ---------- main ---------- */
+  main {
+    flex: 1;
+    padding: clamp(20px, 3vw, 40px);
+    max-width: 100%;
+  }
+
+  .view { display: none; animation: fadeIn 0.35s ease; }
+  .view.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .view-head { margin-bottom: 26px; }
+  .view-head h2 { font-size: 22px; font-weight: 700; }
+  .view-head p { font-size: 13.5px; color: var(--ink-soft); margin-top: 4px; }
+
+  /* stat cards */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+
+  .stat-card .label { font-size: 12px; color: var(--ink-soft); margin-bottom: 8px; }
+  .stat-card .num { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 26px; color: var(--plum-900); }
+  .stat-card .num span { font-size: 13px; color: var(--rose-deep); font-weight: 600; margin-left: 4px; }
+
+  .section-title {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin: 26px 0 14px;
+  }
+
+  /* upcoming list */
+  .upcoming-list { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .upcoming-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .upcoming-row:last-child { border-bottom: none; }
+  .upcoming-row .date-badge {
+    width: 44px; text-align: center; background: var(--blush); border-radius: 8px; padding: 6px 0; flex-shrink: 0;
+  }
+  .date-badge .m { font-size: 9.5px; color: var(--rose-deep); text-transform: uppercase; }
+  .date-badge .d { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 15px; }
+  .upcoming-row .name { font-weight: 600; font-size: 13.5px; }
+  .upcoming-row .type { font-size: 12px; color: var(--ink-soft); }
+
+  /* clients view */
+  .toolbar { display: flex; gap: 10px; margin-bottom: 18px; }
+  .search-box {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    font-size: 13.5px;
+    background: var(--card);
+  }
+  .search-box:focus { outline: none; border-color: var(--rose); }
+
+  .client-table {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .client-row {
+    display: grid;
+    grid-template-columns: 2fr 1.3fr 1fr 0.9fr;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    font-size: 13.5px;
+  }
+  .client-row:last-child { border-bottom: none; }
+  .client-row:hover { background: var(--blush); }
+  .client-row.header-row { font-weight: 600; color: var(--ink-soft); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.03em; cursor: default; }
+  .client-row.header-row:hover { background: transparent; }
+
+  .client-name-cell { display: flex; align-items: center; gap: 10px; }
+  .mini-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--rose); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.lead { background: #F3E7CF; color: #8A6A2A; }
+  .badge.booked { background: #F1DCE0; color: var(--rose-deep); }
+  .badge.completed { background: #E1E9E3; color: #4C6B52; }
+
+  @media (max-width: 640px) {
+    .client-row { grid-template-columns: 2fr 1fr; }
+    .client-row .col-date, .client-row .col-status { display: none; }
+  }
+
+  /* calendar view */
+  .month-group { margin-bottom: 24px; }
+  .month-label { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; color: var(--plum-900); margin-bottom: 10px; }
+
+  /* drawer */
+  .drawer-overlay {
+    position: fixed; inset: 0; background: rgba(46, 31, 53, 0.35);
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+    z-index: 10;
+  }
+  .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100%;
+    width: min(380px, 90vw);
+    background: var(--card);
+    box-shadow: -8px 0 30px rgba(0,0,0,0.12);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
+    z-index: 11;
+    padding: 28px 26px;
+    overflow-y: auto;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-close {
+    background: none; border: none; cursor: pointer;
+    font-size: 20px; color: var(--ink-soft); float: right;
+  }
+
+  .drawer .avatar-lg {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--rose); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .drawer h3 { font-size: 18px; margin-bottom: 2px; }
+  .drawer .role { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 20px; }
+
+  .drawer-field { margin-bottom: 14px; }
+  .drawer-field .k { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 3px; }
+  .drawer-field .v { font-size: 13.5px; }
+
+  .timeline { margin-top: 20px; }
+  .timeline-item { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 12.5px; }
+  .timeline-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rose); margin-top: 5px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="brand">Bloom &amp; Co.</div>
+    <div class="brand-sub">Client Manager</div>
+
+    <div class="nav-item active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" data-view="clients">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.8-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M15 14c2.5 0 5.5 1.6 6 6"/></svg>
+      Clients
+    </div>
+    <div class="nav-item" data-view="calendar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      Calendar
+    </div>
+
+    <div class="sidebar-foot">Demo CRM for a fictional styling studio — portfolio piece, not a real client system.</div>
+  </div>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="view-head">
+        <h2>Good morning ☀️</h2>
+        <p>Here's what's happening with your clients this month.</p>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="label">Total clients</div><div class="num" id="statTotal">0</div></div>
+        <div class="stat-card"><div class="label">Upcoming events</div><div class="num" id="statUpcoming">0</div></div>
+        <div class="stat-card"><div class="label">Leads pending</div><div class="num" id="statLeads">0</div></div>
+        <div class="stat-card"><div class="label">Completed this year</div><div class="num" id="statCompleted">0</div></div>
+      </div>
+      <div class="section-title">Upcoming this month</div>
+      <div class="upcoming-list" id="upcomingList"></div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="view" id="view-clients">
+      <div class="view-head">
+        <h2>Clients</h2>
+        <p>Search or click a client to see full details.</p>
+      </div>
+      <div class="toolbar">
+        <input type="text" class="search-box" id="searchBox" placeholder="Search by name or event type...">
+      </div>
+      <div class="client-table">
+        <div class="client-row header-row">
+          <div>Client</div><div class="col-type">Event</div><div class="col-date">Date</div><div class="col-status">Status</div>
+        </div>
+        <div id="clientList"></div>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="view" id="view-calendar">
+      <div class="view-head">
+        <h2>Upcoming events</h2>
+        <p>All booked events, grouped by month.</p>
+      </div>
+      <div id="calendarGroups"></div>
+    </div>
+
+  </main>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <button class="drawer-close" id="drawerClose">&times;</button>
+    <div id="drawerContent"></div>
+  </div>
+
+<script>
+  const firstNames = ['Andrea','Miguel','Carla','Paolo','Nicole','Jerome','Bianca','Kevin','Trisha','Marco','Denise','Rafael','Alyssa','Josh','Camille','Ivan'];
+  const lastNames = ['Santos','Reyes','Cruz','Bautista','Garcia','Torres','Villanueva','Mendoza','Ramos','Flores'];
+  const eventTypes = ['Wedding','Debut','Corporate Event','Birthday','Baptism','Anniversary'];
+  const statuses = ['lead','booked','completed'];
+
+  function seeded(seed) { let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
+
+  const clients = [];
+  for (let i = 0; i < 18; i++) {
+    const fn = firstNames[i % firstNames.length];
+    const ln = lastNames[Math.floor(seeded(i * 3.1) * lastNames.length)];
+    const type = eventTypes[Math.floor(seeded(i * 5.7) * eventTypes.length)];
+    const status = statuses[Math.floor(seeded(i * 2.3) * statuses.length)];
+    const monthOffset = Math.floor(seeded(i * 4.4) * 4);
+    const day = 3 + Math.floor(seeded(i * 6.6) * 25);
+    const date = new Date();
+    date.setMonth(date.getMonth() + monthOffset);
+    date.setDate(day);
+    clients.push({
+      id: 'c' + i,
+      name: fn + ' ' + ln,
+      initials: fn[0] + ln[0],
+      type, status, date,
+      phone: '09' + (17 + i % 9) + ' ' + (100 + i * 37) % 900 + ' ' + (1000 + i * 91) % 9000,
+      email: fn.toLowerCase() + '.' + ln.toLowerCase() + '@email.com',
+      budget: ['₱80,000', '₱120,000', '₱200,000', '₱350,000', '₱500,000'][i % 5],
+      notes: 'Prefers a ' + ['garden', 'ballroom', 'beachside', 'minimalist', 'rustic'][i % 5] + ' theme.',
+    });
+  }
+  clients.sort((a, b) => a.date - b.date);
+
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // ---------- nav ----------
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + item.dataset.view).classList.add('active');
+    });
+  });
+
+  // ---------- dashboard ----------
+  function animateNum(el, to) {
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(to / 24));
+    const iv = setInterval(() => {
+      cur += step;
+      if (cur >= to) { cur = to; clearInterval(iv); }
+      el.textContent = cur;
+    }, 20);
+  }
+
+  function renderDashboard() {
+    animateNum(document.getElementById('statTotal'), clients.length);
+    animateNum(document.getElementById('statUpcoming'), clients.filter(c => c.status === 'booked').length);
+    animateNum(document.getElementById('statLeads'), clients.filter(c => c.status === 'lead').length);
+    animateNum(document.getElementById('statCompleted'), clients.filter(c => c.status === 'completed').length);
+
+    const upcoming = clients.filter(c => c.status !== 'completed').slice(0, 5);
+    const list = document.getElementById('upcomingList');
+    list.innerHTML = upcoming.map(c => `
+      <div class="upcoming-row">
+        <div class="date-badge"><div class="m">${monthNames[c.date.getMonth()]}</div><div class="d">${c.date.getDate()}</div></div>
+        <div>
+          <div class="name">${c.name}</div>
+          <div class="type">${c.type}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ---------- clients ----------
+  function badgeHTML(status) {
+    const map = { lead: 'Lead', booked: 'Booked', completed: 'Completed' };
+    return `<span class="badge ${status}">${map[status]}</span>`;
+  }
+
+  function renderClients(filter = '') {
+    const list = document.getElementById('clientList');
+    const f = filter.toLowerCase();
+    const filtered = clients.filter(c => c.name.toLowerCase().includes(f) || c.type.toLowerCase().includes(f));
+    list.innerHTML = filtered.map(c => `
+      <div class="client-row" data-id="${c.id}">
+        <div class="client-name-cell">
+          <div class="mini-avatar">${c.initials}</div>
+          <div>${c.name}</div>
+        </div>
+        <div class="col-type">${c.type}</div>
+        <div class="col-date">${monthNames[c.date.getMonth()]} ${c.date.getDate()}</div>
+        <div class="col-status">${badgeHTML(c.status)}</div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.client-row').forEach(row => {
+      row.addEventListener('click', () => openDrawer(row.dataset.id));
+    });
+  }
+
+  document.getElementById('searchBox').addEventListener('input', (e) => renderClients(e.target.value));
+
+  // ---------- calendar ----------
+  function renderCalendar() {
+    const groups = {};
+    clients.forEach(c => {
+      const key = monthNames[c.date.getMonth()] + ' ' + c.date.getFullYear();
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(c);
+    });
+    const el = document.getElementById('calendarGroups');
+    el.innerHTML = Object.entries(groups).map(([month, items]) => `
+      <div class="month-group">
+        <div class="month-label">${month}</div>
+        <div class="upcoming-list">
+          ${items.map(c => `
+            <div class="upcoming-row">
+              <div class="date-badge"><div class="m">${monthNames[c.date.getMonth()]}</div><div class="d">${c.date.getDate()}</div></div>
+              <div>
+                <div class="name">${c.name} — ${c.type}</div>
+                <div class="type">${badgeHTML(c.status)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ---------- drawer ----------
+  const overlay = document.getElementById('drawerOverlay');
+  const drawer = document.getElementById('drawer');
+
+  function openDrawer(id) {
+    const c = clients.find(x => x.id === id);
+    document.getElementById('drawerContent').innerHTML = `
+      <div class="avatar-lg">${c.initials}</div>
+      <h3>${c.name}</h3>
+      <div class="role">${c.type} ${badgeHTML(c.status)}</div>
+
+      <div class="drawer-field"><div class="k">Phone</div><div class="v">${c.phone}</div></div>
+      <div class="drawer-field"><div class="k">Email</div><div class="v">${c.email}</div></div>
+      <div class="drawer-field"><div class="k">Event date</div><div class="v">${monthNames[c.date.getMonth()]} ${c.date.getDate()}, ${c.date.getFullYear()}</div></div>
+      <div class="drawer-field"><div class="k">Budget range</div><div class="v">${c.budget}</div></div>
+      <div class="drawer-field"><div class="k">Notes</div><div class="v">${c.notes}</div></div>
+
+      <div class="timeline">
+        <div class="timeline-item"><div class="dot"></div><div>Initial inquiry received</div></div>
+        <div class="timeline-item"><div class="dot"></div><div>Consultation scheduled</div></div>
+        ${c.status !== 'lead' ? '<div class="timeline-item"><div class="dot"></div><div>Contract signed &amp; deposit received</div></div>' : ''}
+        ${c.status === 'completed' ? '<div class="timeline-item"><div class="dot"></div><div>Event completed</div></div>' : ''}
+      </div>
+    `;
+    overlay.classList.add('open');
+    drawer.classList.add('open');
+  }
+
+  function closeDrawer() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+  }
+
+  overlay.addEventListener('click', closeDrawer);
+  document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+
+  renderDashboard();
+  renderClients();
+  renderCalendar();
+</script>
+</body>
+</html>

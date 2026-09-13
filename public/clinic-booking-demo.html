@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haven Dermatology — Book an Appointment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage: #6B8F71;
+    --sage-deep: #4C6B52;
+    --sage-pale: #E4EBE3;
+    --paper: #F1F3EF;
+    --card: #FFFFFF;
+    --ink: #24302B;
+    --ink-soft: #66756D;
+    --coral: #E08670;
+    --coral-deep: #C96C56;
+    --line: #E0E3DE;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: clamp(20px, 4vw, 48px) 16px;
+  }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  header .brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--sage-deep);
+  }
+
+  header .tagline {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  /* stepper */
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 34px;
+    gap: 4px;
+  }
+
+  .step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .step-dot.active {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+
+  .step-dot.done {
+    background: var(--sage-deep);
+    border-color: var(--sage-deep);
+    color: white;
+  }
+
+  .step-line {
+    width: clamp(20px, 6vw, 44px);
+    height: 1.5px;
+    background: var(--line);
+    transition: background 0.3s ease;
+  }
+
+  .step-line.done { background: var(--sage-deep); }
+
+  /* card */
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: clamp(24px, 5vw, 36px);
+    border: 1px solid var(--line);
+    min-height: 380px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel {
+    display: none;
+  }
+  .panel.active {
+    display: block;
+    animation: fadeSlide 0.4s ease;
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(14px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .panel h2 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 21px;
+    margin-bottom: 6px;
+  }
+
+  .panel .sub {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+  }
+
+  /* service cards */
+  .options {
+    display: grid;
+    gap: 10px;
+  }
+
+  .option-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--paper);
+  }
+
+  .option-card:hover { border-color: var(--sage); }
+
+  .option-card.selected {
+    border-color: var(--sage);
+    background: var(--sage-pale);
+  }
+
+  .option-card .icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--sage-pale);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--sage-deep);
+  }
+
+  .option-card.selected .icon { background: var(--sage); color: white; }
+
+  .option-card .name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .option-card .desc {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .option-card .meta {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  /* provider avatars */
+  .avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: var(--coral);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* date row */
+  .date-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 22px;
+  }
+
+  .date-chip {
+    flex-shrink: 0;
+    width: 58px;
+    padding: 10px 0;
+    text-align: center;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .date-chip:hover { border-color: var(--sage); }
+  .date-chip.selected { background: var(--sage); border-color: var(--sage); color: white; }
+
+  .date-chip .dow { font-size: 10.5px; opacity: 0.7; text-transform: uppercase; }
+  .date-chip .dnum { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 16px; margin-top: 2px; }
+
+  .slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 8px;
+  }
+
+  .slot {
+    padding: 10px 6px;
+    text-align: center;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .slot:hover:not(.taken) { border-color: var(--sage); }
+  .slot.selected { background: var(--sage); border-color: var(--sage); color: white; }
+  .slot.taken { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; }
+
+  /* form */
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--ink); }
+  .field input, .field textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 9px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--sage); }
+  .field textarea { resize: vertical; min-height: 70px; }
+
+  /* nav */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 28px;
+  }
+
+  .btn {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 26px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary { background: var(--sage); color: white; }
+  .btn-primary:hover { background: var(--sage-deep); }
+  .btn-primary:disabled { background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
+
+  .btn-ghost { background: transparent; color: var(--ink-soft); }
+  .btn-ghost:hover { color: var(--ink); }
+
+  /* confirmation */
+  .confirm {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .check-circle {
+    width: 72px; height: 72px;
+    margin: 0 auto 20px;
+  }
+
+  .check-circle svg { width: 100%; height: 100%; }
+  .check-circle circle {
+    fill: none;
+    stroke: var(--sage);
+    stroke-width: 3;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
+    animation: drawCircle 0.6s ease forwards;
+  }
+  .check-circle path {
+    fill: none;
+    stroke: var(--sage);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: drawCheck 0.4s ease 0.5s forwards;
+  }
+  @keyframes drawCircle { to { stroke-dashoffset: 0; } }
+  @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+  .confirm h2 { font-size: 22px; margin-bottom: 8px; }
+  .confirm .ref {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    color: var(--sage-deep);
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .summary-box {
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13.5px;
+  }
+  .summary-line:last-child { border-bottom: none; }
+  .summary-line .k { color: var(--ink-soft); }
+  .summary-line .v { font-weight: 500; }
+
+  footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">Haven Dermatology</div>
+    <div class="tagline">Book your visit in under a minute</div>
+  </header>
+
+  <div class="stepper" id="stepper"></div>
+
+  <div class="card">
+
+    <!-- STEP 1: Service -->
+    <div class="panel active" data-step="1">
+      <h2>What brings you in?</h2>
+      <div class="sub">Choose the type of visit you need.</div>
+      <div class="options" id="serviceOptions"></div>
+      <div class="nav-row">
+        <span></span>
+        <button class="btn btn-primary" id="next1" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Provider -->
+    <div class="panel" data-step="2">
+      <h2>Choose your provider</h2>
+      <div class="sub">Available specialists for this visit type.</div>
+      <div class="options" id="providerOptions"></div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" onclick="goTo(1)">Back</button>
+        <button class="btn btn-primary" id="next2" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Date & Time -->
+    <div class="panel" data-step="3">
+      <h2>Pick a date & time</h2>
+      <div class="sub">Next available slots for your provider.</div>
+      <div class="date-row" id="dateRow"></div>
+      <div class="slot-grid" id="slotGrid"></div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" onclick="goTo(2)">Back</button>
+        <button class="btn btn-primary" id="next3" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Details -->
+    <div class="panel" data-step="4">
+      <h2>Your details</h2>
+      <div class="sub">We'll send your confirmation here.</div>
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="patientName" placeholder="Juan Dela Cruz">
+      </div>
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" id="patientPhone" placeholder="09XX XXX XXXX">
+      </div>
+      <div class="field">
+        <label>Email (optional)</label>
+        <input type="email" id="patientEmail" placeholder="you@email.com">
+      </div>
+      <div class="field">
+        <label>Notes for the clinic (optional)</label>
+        <textarea id="patientNotes" placeholder="Anything we should know before your visit?"></textarea>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" onclick="goTo(3)">Back</button>
+        <button class="btn btn-primary" id="confirmBtn">Confirm booking</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Confirmation -->
+    <div class="panel" data-step="5">
+      <div class="confirm">
+        <div class="check-circle">
+          <svg viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34"/>
+            <path d="M25 41 L35 51 L56 29"/>
+          </svg>
+        </div>
+        <h2>You're all set!</h2>
+        <div class="ref" id="refCode"></div>
+        <div class="summary-box" id="summaryBox"></div>
+        <button class="btn btn-primary" onclick="restart()">Book another visit</button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Demo booking flow for a fictional clinic — built as a portfolio piece, not a live medical service.</footer>
+
+</div>
+
+<script>
+  const services = [
+    { id: 'general', name: 'General Dermatology', desc: 'Skin checks, acne, rashes, general concerns', duration: '30 min' },
+    { id: 'cosmetic', name: 'Cosmetic Treatments', desc: 'Fillers, peels, laser, aesthetic consults', duration: '45 min' },
+    { id: 'pediatric', name: 'Pediatric Skin Care', desc: 'Skin concerns for children & infants', duration: '30 min' },
+  ];
+
+  const providers = [
+    { id: 'p1', name: 'Dr. Reyes', role: 'General Dermatologist', initials: 'AR', handles: ['general'] },
+    { id: 'p2', name: 'Dr. Santos', role: 'Cosmetic Dermatologist', initials: 'MS', handles: ['cosmetic'] },
+    { id: 'p3', name: 'Dr. Villanueva', role: 'Pediatric Dermatologist', initials: 'JV', handles: ['pediatric'] },
+    { id: 'p4', name: 'Dr. Cruz', role: 'General Dermatologist', initials: 'LC', handles: ['general', 'cosmetic'] },
+    { id: 'p5', name: 'Dr. Bautista', role: 'Cosmetic & General', initials: 'RB', handles: ['general', 'cosmetic'] },
+  ];
+
+  const state = {
+    service: null,
+    provider: null,
+    date: null,
+    slot: null,
+  };
+
+  let currentStep = 1;
+  const totalSteps = 4; // step 5 is confirmation, not counted in stepper
+
+  function renderStepper() {
+    const el = document.getElementById('stepper');
+    el.innerHTML = '';
+    for (let i = 1; i <= totalSteps; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'step-dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+      dot.textContent = i < currentStep ? '✓' : i;
+      el.appendChild(dot);
+      if (i < totalSteps) {
+        const line = document.createElement('div');
+        line.className = 'step-line' + (i < currentStep ? ' done' : '');
+        el.appendChild(line);
+      }
+    }
+  }
+
+  function goTo(step) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.panel[data-step="${step}"]`).classList.add('active');
+    currentStep = step;
+    if (step <= totalSteps) renderStepper();
+    else document.getElementById('stepper').style.display = 'none';
+  }
+
+  // ---------- Step 1: services ----------
+  const serviceIcons = {
+    general: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg>',
+    cosmetic: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>',
+    pediatric: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M6 21c0-4 3-6 6-6s6 2 6 6"/></svg>',
+  };
+
+  function renderServices() {
+    const el = document.getElementById('serviceOptions');
+    el.innerHTML = '';
+    services.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'option-card';
+      div.innerHTML = `
+        <div class="icon">${serviceIcons[s.id]}</div>
+        <div>
+          <div class="name">${s.name}</div>
+          <div class="desc">${s.desc}</div>
+        </div>
+        <div class="meta">${s.duration}</div>
+      `;
+      div.addEventListener('click', () => {
+        state.service = s.id;
+        document.querySelectorAll('#serviceOptions .option-card').forEach(c => c.classList.remove('selected'));
+        div.classList.add('selected');
+        document.getElementById('next1').disabled = false;
+      });
+      el.appendChild(div);
+    });
+  }
+  renderServices();
+
+  document.getElementById('next1').addEventListener('click', () => {
+    renderProviders();
+    goTo(2);
+  });
+
+  // ---------- Step 2: providers ----------
+  function renderProviders() {
+    const el = document.getElementById('providerOptions');
+    el.innerHTML = '';
+    const filtered = providers.filter(p => p.handles.includes(state.service));
+    filtered.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'option-card';
+      div.innerHTML = `
+        <div class="avatar">${p.initials}</div>
+        <div>
+          <div class="name">${p.name}</div>
+          <div class="desc">${p.role}</div>
+        </div>
+      `;
+      div.addEventListener('click', () => {
+        state.provider = p.id;
+        document.querySelectorAll('#providerOptions .option-card').forEach(c => c.classList.remove('selected'));
+        div.classList.add('selected');
+        document.getElementById('next2').disabled = false;
+      });
+      el.appendChild(div);
+    });
+  }
+
+  document.getElementById('next2').addEventListener('click', () => {
+    renderDates();
+    goTo(3);
+  });
+
+  // ---------- Step 3: date & time ----------
+  function seededRandom(seed) {
+    let x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  function renderDates() {
+    const dateRow = document.getElementById('dateRow');
+    dateRow.innerHTML = '';
+    const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const today = new Date();
+    let count = 0, offset = 0;
+    const dates = [];
+    while (count < 10) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + offset);
+      offset++;
+      if (d.getDay() === 0) continue; // closed Sundays
+      dates.push(d);
+      count++;
+    }
+    dates.forEach((d, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'date-chip';
+      chip.innerHTML = `<div class="dow">${dows[d.getDay()]}</div><div class="dnum">${d.getDate()}</div>`;
+      chip.addEventListener('click', () => {
+        state.date = d.toDateString();
+        state.slot = null;
+        document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        renderSlots(d);
+        document.getElementById('next3').disabled = true;
+      });
+      dateRow.appendChild(chip);
+      if (i === 0) chip.click();
+    });
+  }
+
+  function renderSlots(date) {
+    const grid = document.getElementById('slotGrid');
+    grid.innerHTML = '';
+    const times = ['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM'];
+    const seedBase = date.getDate() + (state.provider ? state.provider.charCodeAt(1) : 1) * 7;
+    times.forEach((t, i) => {
+      const taken = seededRandom(seedBase + i) > 0.62;
+      const slot = document.createElement('div');
+      slot.className = 'slot' + (taken ? ' taken' : '');
+      slot.textContent = t;
+      if (!taken) {
+        slot.addEventListener('click', () => {
+          state.slot = t;
+          document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+          slot.classList.add('selected');
+          document.getElementById('next3').disabled = false;
+        });
+      }
+      grid.appendChild(slot);
+    });
+  }
+
+  document.getElementById('next3').addEventListener('click', () => goTo(4));
+
+  // ---------- Step 4: details ----------
+  document.getElementById('confirmBtn').addEventListener('click', () => {
+    const name = document.getElementById('patientName').value.trim();
+    const phone = document.getElementById('patientPhone').value.trim();
+    if (!name || !phone) {
+      alert('Please fill in your name and phone number.');
+      return;
+    }
+    showConfirmation(name, phone);
+  });
+
+  function showConfirmation(name, phone) {
+    const providerObj = providers.find(p => p.id === state.provider);
+    const serviceObj = services.find(s => s.id === state.service);
+    const ref = 'HD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    document.getElementById('refCode').textContent = 'Reference: ' + ref;
+    document.getElementById('summaryBox').innerHTML = `
+      <div class="summary-line"><span class="k">Patient</span><span class="v">${name}</span></div>
+      <div class="summary-line"><span class="k">Service</span><span class="v">${serviceObj.name}</span></div>
+      <div class="summary-line"><span class="k">Provider</span><span class="v">${providerObj.name}</span></div>
+      <div class="summary-line"><span class="k">Date</span><span class="v">${state.date}</span></div>
+      <div class="summary-line"><span class="k">Time</span><span class="v">${state.slot}</span></div>
+      <div class="summary-line"><span class="k">Contact</span><span class="v">${phone}</span></div>
+    `;
+    goTo(5);
+  }
+
+  function restart() {
+    state.service = null; state.provider = null; state.date = null; state.slot = null;
+    document.getElementById('patientName').value = '';
+    document.getElementById('patientPhone').value = '';
+    document.getElementById('patientEmail').value = '';
+    document.getElementById('patientNotes').value = '';
+    document.getElementById('next1').disabled = true;
+    document.getElementById('next2').disabled = true;
+    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('stepper').style.display = 'flex';
+    goTo(1);
+  }
+
+  renderStepper();
+</script>
+</body>
+</html>

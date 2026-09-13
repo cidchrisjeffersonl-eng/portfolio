@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoleTrade PH — Order Fulfillment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --kraft: #B4894F;
+    --kraft-deep: #93693A;
+    --kraft-dark: #6E4F2A;
+    --label: #F8F2E4;
+    --ink: #22303F;
+    --ink-soft: #5B6B78;
+    --stamp-blue: #2F5C8A;
+    --stamp-green: #3E7A52;
+    --stamp-red: #B23A2E;
+    --stamp-amber: #B4842A;
+    --line: #D9CBAE;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.06), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(0,0,0,0.08), transparent 40%),
+      var(--kraft);
+    min-height: 100vh;
+    padding: clamp(20px, 4vw, 44px) 16px 80px;
+  }
+
+  .oswald { font-family: 'Oswald', sans-serif; }
+  .mono { font-family: 'Space Mono', monospace; }
+
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  /* header */
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--label);
+  }
+
+  header .brand {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 5vw, 34px);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  header .sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-top: 4px;
+  }
+
+  /* filter tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .tab {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    background: rgba(248,242,228,0.15);
+    color: var(--label);
+    border: 1.5px solid rgba(248,242,228,0.3);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab:hover { background: rgba(248,242,228,0.28); }
+  .tab.active { background: var(--label); color: var(--kraft-dark); border-color: var(--label); }
+
+  /* grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 20px;
+  }
+
+  /* parcel card */
+  .parcel {
+    background: var(--label);
+    border-radius: 4px;
+    position: relative;
+    padding: 22px 22px 20px;
+    box-shadow: 0 10px 24px rgba(30,20,10,0.18);
+    transform: rotate(-0.4deg);
+  }
+  .parcel:nth-child(even) { transform: rotate(0.4deg); }
+
+  .perf-top, .perf-bottom {
+    position: absolute; left: 0; right: 0; height: 10px;
+    background-image: radial-gradient(circle, var(--kraft) 3.5px, transparent 3.6px);
+    background-size: 16px 16px;
+    background-repeat: repeat-x;
+  }
+  .perf-top { top: -5px; }
+  .perf-bottom { bottom: -5px; }
+
+  .parcel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .track-code {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.03em;
+  }
+
+  .barcode {
+    height: 26px;
+    margin-top: 6px;
+    width: 130px;
+  }
+
+  .stamp {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 2px solid currentColor;
+    border-radius: 4px;
+    transform: rotate(-6deg);
+    white-space: nowrap;
+  }
+
+  .stamp.pending { color: var(--stamp-red); }
+  .stamp.packed { color: var(--stamp-amber); }
+  .stamp.shipped { color: var(--stamp-blue); }
+  .stamp.out { color: var(--stamp-blue); }
+  .stamp.delivered { color: var(--stamp-green); }
+
+  .item-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    margin-bottom: 2px;
+  }
+
+  .buyer-line {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+
+  .buyer-line strong { color: var(--ink); font-weight: 600; }
+
+  /* route trail */
+  .route {
+    position: relative;
+    margin: 20px 4px 8px;
+  }
+
+  .route-line {
+    position: absolute;
+    top: 9px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background-image: linear-gradient(to right, var(--line) 60%, transparent 0%);
+    background-size: 8px 2px;
+    background-repeat: repeat-x;
+  }
+
+  .route-line-fill {
+    position: absolute;
+    top: 9px;
+    left: 8px;
+    height: 2px;
+    background: var(--stamp-blue);
+    transition: width 0.6s ease;
+  }
+
+  .route-stages {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .route-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20%;
+  }
+
+  .route-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--label);
+    border: 2px solid var(--line);
+    z-index: 1;
+    transition: all 0.4s ease;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .route-dot.done { border-color: var(--stamp-blue); background: var(--stamp-blue); }
+  .route-dot.current {
+    border-color: var(--stamp-blue);
+    background: var(--label);
+    box-shadow: 0 0 0 4px rgba(47,92,138,0.18);
+    animation: pulse 1.4s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(47,92,138,0.18); }
+    50% { box-shadow: 0 0 0 7px rgba(47,92,138,0.1); }
+  }
+
+  .route-label {
+    font-size: 9.5px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  .parcel-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+  }
+
+  .price {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .advance-btn {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: var(--kraft-dark);
+    color: var(--label);
+    border: none;
+    padding: 9px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .advance-btn:hover:not(:disabled) { background: var(--kraft-deep); }
+  .advance-btn:disabled { background: #D6CBB4; color: #9A8E76; cursor: default; }
+
+  /* toast */
+  .toast-stack {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    display: flex; flex-direction: column-reverse; gap: 8px;
+    z-index: 50;
+  }
+
+  .toast {
+    background: var(--ink);
+    color: var(--label);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    max-width: 280px;
+    animation: toastIn 0.3s ease, toastOut 0.4s ease 2.6s forwards;
+  }
+
+  @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateX(20px); } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">SoleTrade PH</div>
+    <div class="sub">Order Fulfillment · Demo</div>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+  const stages = ['Pending', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
+  const stageKeys = ['pending', 'packed', 'shipped', 'out', 'delivered'];
+
+  const buyers = ['J. Manalo', 'K. Dizon', 'A. Fernandez', 'R. Tolentino', 'C. Aquino', 'M. Salazar', 'P. Domingo', 'L. Navarro', 'B. Castillo', 'E. Ramirez'];
+  const items = ['Nike Dunk Low "Panda"', 'Adidas Samba OG', 'New Balance 550', 'Air Jordan 1 Mid', 'Vans Old Skool', 'Converse Chuck 70', 'Asics Gel-1130', 'On Cloud 5', 'Puma Suede Classic', 'Nike Air Force 1'];
+
+  function seeded(s) { const x = Math.sin(s) * 10000; return x - Math.floor(x); }
+
+  let orders = [];
+  for (let i = 0; i < 10; i++) {
+    const statusIdx = Math.min(4, Math.floor(seeded(i * 3.3) * 5));
+    orders.push({
+      id: 'ST-' + (10230 + i * 7),
+      buyer: buyers[i],
+      item: items[i],
+      price: '₱' + (2500 + Math.floor(seeded(i * 1.7) * 6000)).toLocaleString(),
+      statusIdx,
+      barcodeBars: Array.from({ length: 24 }, (_, k) => 1 + Math.floor(seeded(i * 9 + k) * 3)),
+    });
+  }
+
+  let activeFilter = 'all';
+
+  function renderTabs() {
+    const tabsEl = document.getElementById('tabs');
+    const filters = [{ key: 'all', label: 'All' }, ...stageKeys.map((k, i) => ({ key: k, label: stages[i] }))];
+    tabsEl.innerHTML = filters.map(f => `<div class="tab ${f.key === activeFilter ? 'active' : ''}" data-key="${f.key}">${f.label}</div>`).join('');
+    tabsEl.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => { activeFilter = t.dataset.key; renderTabs(); renderGrid(); });
+    });
+  }
+
+  function barcodeSVG(bars) {
+    let x = 0;
+    const rects = bars.map(w => {
+      const rect = `<rect x="${x}" y="0" width="${w}" height="26" fill="#22303F"/>`;
+      x += w + 2;
+      return rect;
+    }).join('');
+    return `<svg class="barcode" viewBox="0 0 ${x} 26" preserveAspectRatio="none">${rects}</svg>`;
+  }
+
+  function routeHTML(statusIdx) {
+    const fillPct = (statusIdx / (stages.length - 1)) * 100;
+    return `
+      <div class="route">
+        <div class="route-line"></div>
+        <div class="route-line-fill" style="width: calc(${fillPct}% - ${fillPct > 0 ? '4px' : '0px'})"></div>
+        <div class="route-stages">
+          ${stages.map((s, i) => `
+            <div class="route-stage">
+              <div class="route-dot ${i < statusIdx ? 'done' : i === statusIdx ? 'current' : ''}"></div>
+              <div class="route-label">${s}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    const filtered = activeFilter === 'all' ? orders : orders.filter(o => stageKeys[o.statusIdx] === activeFilter);
+    grid.innerHTML = filtered.map(o => `
+      <div class="parcel" data-id="${o.id}">
+        <div class="perf-top"></div>
+        <div class="parcel-top">
+          <div>
+            <div class="track-code">TRACKING #${o.id}</div>
+            ${barcodeSVG(o.barcodeBars)}
+          </div>
+          <div class="stamp ${stageKeys[o.statusIdx]}">${stages[o.statusIdx]}</div>
+        </div>
+        <div class="item-name">${o.item}</div>
+        <div class="buyer-line">Buyer: <strong>${o.buyer}</strong></div>
+        ${routeHTML(o.statusIdx)}
+        <div class="parcel-foot">
+          <div class="price">${o.price}</div>
+          <button class="advance-btn" data-id="${o.id}" ${o.statusIdx >= stages.length - 1 ? 'disabled' : ''}>
+            ${o.statusIdx >= stages.length - 1 ? 'Delivered ✓' : 'Advance →'}
+          </button>
+        </div>
+        <div class="perf-bottom"></div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.advance-btn').forEach(btn => {
+      btn.addEventListener('click', () => advanceOrder(btn.dataset.id));
+    });
+  }
+
+  function showToast(msg) {
+    const stack = document.getElementById('toastStack');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    stack.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  function advanceOrder(id) {
+    const order = orders.find(o => o.id === id);
+    if (!order || order.statusIdx >= stages.length - 1) return;
+    order.statusIdx++;
+    renderGrid();
+    showToast('📧 Notified ' + order.buyer + ': order ' + order.id + ' is now "' + stages[order.statusIdx] + '"');
+  }
+
+  renderTabs();
+  renderGrid();
+</script>
+</body>
+</html>
