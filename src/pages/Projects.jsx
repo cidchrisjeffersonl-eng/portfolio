@@ -4,10 +4,10 @@ export default function Projects() {
       emoji: "📊",
       title: "Smart Feedback Analytics",
       description:
-        "Full-stack AI-integrated faculty evaluation platform. Built with React, Node.js/TypeScript, PostgreSQL, and a locally-hosted LLM (Ollama). Features NLP sentiment analysis, thematic categorization, role-based dashboards for 4 user roles, and an AI-assisted intervention system that flags at-risk faculty performance trends.",
-      tags: ["React", "Node.js", "TypeScript", "PostgreSQL", "Ollama", "Docker", "Spring Boot"],
+        "Interactive preview of the analytics dashboard from the Smart Feedback Analytics capstone — AI-generated insights, sentiment breakdown, thematic clustering, and phrase-level sentiment annotation on flagged faculty comments. Built with synthetic data to showcase the UI/analytics layer of the full-stack system",
+      tags: ["JavaScript", "Data Visualization", "NLP UI"],
       github: "https://github.com/cidchrisjeffersonl-eng/smart-feedback-analytics",
-      demo: null,
+      demo: "/edupulse-ai-demo.html",
       featured: true,
     },
     {
@@ -45,7 +45,7 @@ export default function Projects() {
         "Online scheduling system for a small dermatology clinic, enabling bookings across 3+ service categories for a 5-person clinic team. Built with React and Node.js/PostgreSQL.",
       tags: ["React", "Node.js", "PostgreSQL"],
       github: null,
-      demo: null,
+      demo: "/clinic-booking-demo.html",
     },
     {
       emoji: "📋",
