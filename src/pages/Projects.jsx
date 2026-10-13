@@ -65,6 +65,15 @@ export default function Projects() {
       github: null,
       demo: "/order-tracking-demo.html",
     },
+    {
+      emoji: "☕",
+      title: "Lurk POS System",
+      description:
+        "Point-of-sale and inventory system for a cafe — live shared stock across every device, staff PIN login with a full activity log, simulated supplier auto-reordering, and a nightly closing-count reconciliation that flags discrepancies for the owner. Built with a real-time shared database so every sale, restock, and delivery updates instantly everywhere.",
+      tags: ["JavaScript", "Real-time Database", "POS System"],
+      github: null,
+      demo: "/lurk-pos-demo.html",
+    },
   ];
 
   return (

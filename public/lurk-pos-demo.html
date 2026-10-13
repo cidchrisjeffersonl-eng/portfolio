@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f3ecdd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1410" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lurk">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%232b1b14'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
+<title>Lurk — POS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3ecdd;
+    --card: #fbf8f2;
+    --ink: #2b1b14;
+    --ink-soft: #6b5847;
+    --ink-faint: #8a7863;
+    --line: #ddd0b8;
+    --sage: #62734b;
+    --sage-bg: #e4e8d8;
+    --brass: #8f6f2c;
+    --brass-bg: #f0e3c4;
+    --clay: #a54a2a;
+    --clay-bg: #f3ddd0;
+    --shadow: rgba(43, 27, 20, 0.08);
+    --radius-s: 4px;
+    --radius-m: 10px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1c1410; --card: #271c15; --ink: #f1e7d6; --ink-soft: #c9b9a4; --ink-faint: #9a8a77;
+      --line: #4a3a2a; --sage: #93a878; --sage-bg: #2c3324; --brass: #d3ae74; --brass-bg: #3a2f1c;
+      --clay: #e08a63; --clay-bg: #3d2620; --shadow: rgba(0, 0, 0, 0.35); color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1c1410; --card: #271c15; --ink: #f1e7d6; --ink-soft: #c9b9a4; --ink-faint: #9a8a77;
+    --line: #4a3a2a; --sage: #93a878; --sage-bg: #2c3324; --brass: #d3ae74; --brass-bg: #3a2f1c;
+    --clay: #e08a63; --clay-bg: #3d2620; --shadow: rgba(0, 0, 0, 0.35); color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; -webkit-font-smoothing: antialiased; }
+  body { padding: 20px; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(20px, env(safe-area-inset-bottom)); min-height: 100vh; }
+  .serif { font-family: 'Fraunces', Georgia, 'Times New Roman', serif; }
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: var(--radius-s); }
+  button:disabled { cursor: not-allowed; }
+  button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+  input, select { font-family: inherit; }
+  @media (pointer: coarse) { input, select { font-size: 16px !important; } }
+
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand-mark { font-family: 'Fraunces', serif; font-weight: 700; font-size: 26px; letter-spacing: -0.01em; }
+  .brand-mark em { font-style: italic; font-weight: 500; color: var(--sage); }
+  .brand-tag { font-size: 11px; color: var(--ink-faint); }
+
+  nav.tabs { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; flex-wrap: wrap; }
+  nav.tabs button { border: none; background: transparent; padding: 7px 14px; border-radius: 999px; font-size: 12.5px; color: var(--ink-soft); letter-spacing: 0.02em; display: flex; align-items: center; gap: 6px; }
+  nav.tabs button.active { background: var(--sage); color: var(--paper); }
+  .badge { font-size: 10px; background: var(--clay); color: #fff; border-radius: 999px; padding: 1px 6px; line-height: 1.4; }
+  nav.tabs button.active .badge { background: var(--paper); color: var(--sage); }
+
+  .status-cluster { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .sync-pill { display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); transition: background 0.25s, border-color 0.25s; }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); flex: none; }
+  .sync-pill.local .sync-dot { background: var(--ink-faint); }
+  .sync-pill.syncing .sync-dot { background: var(--brass); animation: pulse 0.9s ease-in-out infinite; }
+  .sync-pill.offline .sync-dot { background: var(--clay); animation: none; }
+  .sync-pill.offline { border-color: var(--clay); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { .sync-pill.syncing .sync-dot, .auto-panel-head .dot { animation: none; } * { transition: none !important; } }
+  .ghost-btn { font-size: 11.5px; padding: 6px 10px; color: var(--ink-soft); }
+  .ghost-btn:hover { color: var(--ink); border-color: var(--ink-faint); }
+
+  .staff-chip { display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); }
+  .staff-chip .avatar { width: 18px; height: 18px; border-radius: 50%; background: var(--sage); color: var(--paper); font-size: 9.5px; display: flex; align-items: center; justify-content: center; font-weight: 600; flex: none; }
+
+  /* ---------- Owner alert strip ---------- */
+  .alert-strip { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--clay-bg); border: 1px solid var(--clay); color: var(--clay); border-radius: var(--radius-m); padding: 10px 14px; font-size: 12.5px; margin-bottom: 18px; }
+  .alert-strip strong { font-family: 'Fraunces', serif; font-weight: 600; font-size: 14px; margin-right: 6px; }
+  .alert-strip button { color: var(--clay); border-color: var(--clay); background: transparent; font-size: 11.5px; padding: 6px 12px; }
+
+  .order-layout { display: grid; grid-template-columns: 1fr 340px; gap: 22px; align-items: start; }
+  @media (max-width: 860px) { .order-layout { grid-template-columns: 1fr; } }
+
+  .cat-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+  .cat-row button { padding: 6px 13px; font-size: 12px; border-radius: 999px; color: var(--ink-soft); }
+  .cat-row button.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
+  .item-card { text-align: left; background: var(--card); padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--radius-m); transition: transform 0.12s ease, box-shadow 0.12s ease; }
+  .item-card:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 14px var(--shadow); }
+  .item-card:disabled { opacity: 0.45; cursor: not-allowed; }
+  .item-cat-tag { font-size: 10px; color: var(--sage); letter-spacing: 0.03em; }
+  .item-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; line-height: 1.25; }
+  .item-foot { display: flex; justify-content: space-between; align-items: baseline; margin-top: auto; }
+  .item-price { font-size: 14px; font-weight: 600; }
+  .item-avail { font-size: 10.5px; color: var(--ink-faint); }
+  .item-avail.low { color: var(--clay); }
+
+  .ticket { background: var(--card); border-radius: var(--radius-m); padding: 18px 16px 16px; position: relative; }
+  .ticket h2 { font-size: 13px; margin: 0 0 2px; letter-spacing: 0.02em; }
+  .ticket-sub { font-size: 10.5px; color: var(--ink-faint); margin-bottom: 12px; }
+  .ticket-empty { font-size: 12px; color: var(--ink-faint); padding: 18px 0; text-align: center; }
+
+  .line-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+  .line-item .li-name { flex: 1; font-size: 12.5px; }
+  .line-item .li-price { font-size: 11.5px; color: var(--ink-faint); }
+  .qty-stepper { display: flex; align-items: center; gap: 6px; }
+  .qty-stepper button { width: 24px; height: 24px; font-size: 13px; line-height: 1; padding: 0; border-radius: var(--radius-s); }
+  .qty-stepper span { font-size: 12px; min-width: 14px; text-align: center; }
+
+  .ticket-totals { padding-top: 14px; margin-top: 4px; font-size: 12.5px; }
+  .ticket-totals .row { display: flex; justify-content: space-between; padding: 3px 0; color: var(--ink-soft); }
+  .ticket-totals .row.total { color: var(--ink); font-size: 15px; font-weight: 600; padding-top: 8px; border-top: 1px solid var(--line); margin-top: 6px; }
+
+  .pay-block { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .pay-label { font-size: 10.5px; color: var(--ink-faint); margin-bottom: 7px; letter-spacing: 0.02em; }
+  .pay-methods { display: flex; gap: 6px; margin-bottom: 10px; }
+  .pay-methods button { flex: 1; padding: 8px 4px; font-size: 11.5px; border-radius: var(--radius-s); }
+  .pay-methods button.active { background: var(--brass); color: var(--paper); border-color: var(--brass); }
+  :root[data-theme="dark"] .pay-methods button.active { color: #1c1410; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pay-methods button.active { color: #1c1410; } }
+  .cash-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .cash-row input { width: 100%; padding: 8px 9px; border: 1px solid var(--line); border-radius: var(--radius-s); background: var(--paper); color: var(--ink); font-size: 13px; }
+  .change-line { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; }
+  .change-line.warn { color: var(--clay); }
+  .change-line.ok { color: var(--sage); }
+
+  .send-btn { width: 100%; margin-top: 12px; padding: 11px; border-radius: var(--radius-s); background: var(--sage); color: var(--paper); border: none; font-size: 12.5px; letter-spacing: 0.03em; font-weight: 600; }
+  .send-btn:disabled { opacity: 0.5; }
+  .send-btn:hover:not(:disabled) { background: var(--ink); }
+  :root[data-theme="dark"] .send-btn { color: #1c1410; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .send-btn { color: #1c1410; } }
+  .ticket-error { font-size: 11px; color: var(--clay); margin-top: 8px; min-height: 14px; }
+
+  .recent-log { margin-top: 18px; }
+  .recent-log h3 { font-size: 11px; color: var(--ink-faint); font-weight: 500; margin: 0 0 8px; letter-spacing: 0.02em; }
+  .log-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; padding: 5px 0; color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+  .log-row:last-child { border-bottom: none; }
+  .log-status { font-size: 9.5px; padding: 1px 7px; border-radius: 999px; flex: none; align-self: center; }
+  .log-status.synced { background: var(--sage-bg); color: var(--sage); }
+  .log-status.syncing { background: var(--brass-bg); color: var(--brass); }
+  .log-status.queued { background: var(--clay-bg); color: var(--clay); }
+
+  /* ---------- Prep queue ---------- */
+  .queue-empty { text-align: center; padding: 60px 20px; color: var(--ink-faint); font-size: 13px; }
+  .queue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .queue-card { background: var(--card); border-radius: var(--radius-m); padding: 16px; border-left: 3px solid var(--brass); }
+  .queue-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .queue-num { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; }
+  .queue-time { font-size: 10.5px; color: var(--ink-faint); }
+  .queue-items { list-style: none; margin: 10px 0; padding: 0; font-size: 12.5px; }
+  .queue-items li { padding: 3px 0; display: flex; justify-content: space-between; }
+  .queue-foot { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-soft); margin-bottom: 10px; padding-top: 8px; border-top: 1px dashed var(--line); gap: 8px; }
+  .pay-chip { font-size: 9.5px; padding: 1px 7px; border-radius: 999px; background: var(--sage-bg); color: var(--sage); }
+  .done-btn { width: 100%; padding: 9px; font-size: 11.5px; background: var(--sage); color: var(--paper); border: none; border-radius: var(--radius-s); letter-spacing: 0.02em; font-weight: 600; }
+  .done-btn:hover { background: var(--ink); }
+  :root[data-theme="dark"] .done-btn { color: #1c1410; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .done-btn { color: #1c1410; } }
+
+  /* ---------- Storage view ---------- */
+  .low-banner { background: var(--clay-bg); border: 1px solid var(--clay); color: var(--clay); border-radius: var(--radius-m); padding: 12px 16px; font-size: 12.5px; margin-bottom: 18px; display: flex; gap: 10px; align-items: flex-start; }
+  .low-banner strong { display: block; font-family: 'Fraunces', serif; font-size: 14px; margin-bottom: 3px; }
+  .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .stock-card { background: var(--card); border-radius: var(--radius-m); padding: 14px 15px; }
+  .stock-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 8px; }
+  .stock-name { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 500; }
+  .stock-tag { font-size: 9.5px; padding: 1px 7px; border-radius: 999px; flex: none; }
+  .stock-tag.ok { background: var(--sage-bg); color: var(--sage); }
+  .stock-tag.low { background: var(--brass-bg); color: var(--brass); }
+  .stock-tag.critical { background: var(--clay-bg); color: var(--clay); }
+  .stock-num { font-size: 11.5px; color: var(--ink-soft); margin-bottom: 8px; }
+  .bar-track { height: 6px; background: var(--paper); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; background: var(--sage); }
+  .bar-fill.low { background: var(--brass); }
+  .bar-fill.critical { background: var(--clay); }
+  .card-actions { display: flex; gap: 6px; }
+  .restock-btn { flex: 1; font-size: 11px; padding: 7px; letter-spacing: 0.02em; }
+  .restock-btn:hover:not(:disabled) { border-color: var(--sage); color: var(--sage); }
+  .restock-btn:disabled { opacity: 0.5; }
+
+  /* ---------- Supplier panel ---------- */
+  .auto-panel { background: var(--card); border: 1px solid var(--brass); border-radius: var(--radius-m); padding: 14px 16px; margin-bottom: 18px; }
+  .auto-panel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .auto-panel-head .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brass); animation: pulse 1.1s ease-in-out infinite; }
+  .auto-panel-head h3 { font-size: 12px; margin: 0; letter-spacing: 0.02em; }
+  .auto-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; padding: 7px 0; border-bottom: 1px dashed var(--line); flex-wrap: wrap; }
+  .auto-row:last-child { border-bottom: none; }
+  .auto-row small { display: block; color: var(--ink-faint); font-size: 10.5px; margin-top: 2px; }
+  .auto-status { font-size: 9.5px; padding: 2px 8px; border-radius: 999px; }
+  .auto-status.ordering { background: var(--brass-bg); color: var(--brass); }
+  .auto-status.transit { background: var(--brass-bg); color: var(--brass); }
+  .auto-status.arrived { background: var(--clay-bg); color: var(--clay); }
+  .auto-status.received { background: var(--sage-bg); color: var(--sage); }
+  .receive-btn { font-size: 11px; padding: 6px 12px; background: var(--sage); color: var(--paper); border: none; font-weight: 600; }
+  .receive-btn:hover:not(:disabled) { background: var(--ink); }
+  .receive-btn:disabled { opacity: 0.5; }
+  :root[data-theme="dark"] .receive-btn { color: #1c1410; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .receive-btn { color: #1c1410; } }
+
+  /* ---------- Insights ---------- */
+  .range-row { display: flex; gap: 7px; margin-bottom: 16px; }
+  .range-row button { padding: 6px 13px; font-size: 12px; border-radius: 999px; color: var(--ink-soft); }
+  .range-row button.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .insight-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .insight-card { background: var(--card); border-radius: var(--radius-m); padding: 16px; }
+  .insight-card .label { font-size: 10.5px; color: var(--ink-faint); letter-spacing: 0.02em; margin-bottom: 6px; }
+  .insight-card .value { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; }
+  .insight-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px) { .insight-cols { grid-template-columns: 1fr; } }
+  .insight-block { margin-bottom: 22px; }
+  .insight-block h3 { font-size: 15px; font-weight: 500; margin: 0 0 12px; }
+  .seller-row { margin-bottom: 12px; }
+  .seller-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+  .seller-bar-track { height: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .seller-bar-fill { height: 100%; background: var(--sage); border-radius: 999px; }
+  .pay-split-row { margin-bottom: 14px; }
+  .pay-split-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+  .pay-split-track { height: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .pay-split-fill { height: 100%; background: var(--brass); border-radius: 999px; }
+  .insight-empty { text-align: center; padding: 40px 20px; color: var(--ink-faint); font-size: 13px; }
+  .staff-table { background: var(--card); border-radius: var(--radius-m); padding: 6px 16px; font-size: 12px; }
+  .staff-table .st-head, .staff-table .st-line { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 8px; padding: 9px 0; align-items: center; }
+  .staff-table .st-head { color: var(--ink-faint); font-size: 10.5px; border-bottom: 1px solid var(--line); }
+  .staff-table .st-line { border-bottom: 1px dashed var(--line); }
+  .staff-table .st-line:last-child { border-bottom: none; }
+  .staff-table .num { text-align: right; }
+
+  /* ---------- Closing count ---------- */
+  .count-list { background: var(--card); border-radius: var(--radius-m); padding: 4px 14px; margin-bottom: 14px; }
+  .count-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--line); flex-wrap: wrap; }
+  .count-row:last-child { border-bottom: none; }
+  .count-name { flex: 1 1 130px; font-family: 'Fraunces', serif; font-size: 13.5px; }
+  .count-expected { font-size: 10.5px; color: var(--ink-faint); flex: 0 0 auto; }
+  .count-input { width: 78px; padding: 7px 8px; border: 1px solid var(--line); border-radius: var(--radius-s); background: var(--paper); color: var(--ink); font-size: 13px; flex: 0 0 auto; }
+  .count-match { font-size: 10.5px; padding: 6px 10px; flex: 0 0 auto; }
+  .count-diff { font-size: 11px; min-width: 64px; text-align: right; color: var(--ink-faint); flex: 0 0 auto; }
+  .count-diff.ok { color: var(--sage); }
+  .count-diff.flag { color: var(--clay); font-weight: 600; }
+  .count-done { background: var(--card); border-radius: var(--radius-m); padding: 18px; margin-bottom: 16px; }
+  .count-done strong { font-family: 'Fraunces', serif; font-size: 16px; display: block; margin-bottom: 4px; }
+  .count-flagged-chip { display: inline-block; font-size: 10.5px; padding: 2px 8px; border-radius: 999px; background: var(--clay-bg); color: var(--clay); margin: 3px 4px 0 0; }
+  .count-ok-chip { display: inline-block; font-size: 10.5px; padding: 2px 8px; border-radius: 999px; background: var(--sage-bg); color: var(--sage); margin-top: 3px; }
+
+  footer.note { margin-top: 30px; font-size: 10.5px; color: var(--ink-faint); text-align: center; line-height: 1.6; }
+
+  /* ---------- Staff login ---------- */
+  .login-overlay { position: fixed; inset: 0; background: var(--paper); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+  .login-card { width: 100%; max-width: 320px; text-align: center; }
+  .login-card .login-brand { font-family: 'Fraunces', serif; font-weight: 700; font-size: 24px; margin-bottom: 4px; }
+  .login-card .login-sub { font-size: 11.5px; color: var(--ink-faint); margin-bottom: 26px; }
+  .staff-pick { display: flex; flex-direction: column; gap: 8px; }
+  .staff-pick button { padding: 13px; border-radius: var(--radius-m); font-size: 13.5px; text-align: left; display: flex; align-items: center; gap: 10px; }
+  .staff-pick button:hover { border-color: var(--sage); }
+  .staff-pick .avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--sage); color: var(--paper); font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 600; flex: none; }
+  :root[data-theme="dark"] .staff-pick .avatar, :root[data-theme="dark"] .staff-chip .avatar { color: #1c1410; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .staff-pick .avatar, :root:not([data-theme="light"]) .staff-chip .avatar { color: #1c1410; } }
+  .staff-pick .role { margin-left: auto; font-size: 10.5px; color: var(--ink-faint); }
+  .login-note { font-size: 11.5px; color: var(--ink-faint); padding: 18px 0; line-height: 1.6; }
+  .pin-name { font-size: 13px; margin-bottom: 4px; }
+  .pin-back { font-size: 11px; color: var(--ink-faint); margin-bottom: 18px; background: none; border: none; padding: 4px; text-decoration: underline; }
+  .pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+  .pin-dots span { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--ink-faint); }
+  .pin-dots span.filled { background: var(--ink); border-color: var(--ink); }
+  .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .pin-pad button { padding: 15px 0; font-size: 16px; border-radius: var(--radius-m); }
+  .pin-pad button:hover { border-color: var(--sage); }
+  .pin-pad .blank { visibility: hidden; }
+  .pin-error { font-size: 11.5px; color: var(--clay); margin-top: 12px; min-height: 16px; }
+
+  /* ---------- Activity log ---------- */
+  .activity-block { margin-top: 26px; }
+  .activity-block h3 { font-size: 15px; font-weight: 500; margin: 0 0 4px; }
+  .activity-sub { font-size: 11px; color: var(--ink-faint); margin-bottom: 12px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .filters label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-faint); }
+  .filters select { font-size: 12px; padding: 6px 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: var(--radius-s); max-width: 170px; }
+  .activity-list { background: var(--card); border-radius: var(--radius-m); padding: 4px 14px; }
+  .activity-row { display: flex; gap: 10px; font-size: 11.5px; padding: 9px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-actor { flex: none; width: 92px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .activity-actor.system { color: var(--brass); }
+  .activity-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .activity-text .kind { display: inline-block; font-size: 9.5px; padding: 1px 7px; border-radius: 999px; margin-right: 6px; }
+  .kind.restock { background: var(--sage-bg); color: var(--sage); }
+  .kind.receive { background: var(--brass-bg); color: var(--brass); }
+  .kind.sale { background: var(--paper); color: var(--ink-faint); border: 1px solid var(--line); }
+  .activity-text .flag { color: var(--clay); }
+  .activity-time { flex: none; color: var(--ink-faint); font-size: 10.5px; }
+  .activity-empty { padding: 22px 0; text-align: center; color: var(--ink-faint); font-size: 12px; }
+  .more-btn { margin-top: 10px; font-size: 11.5px; padding: 7px 14px; }
+  @media (max-width: 560px) { .activity-actor { width: 64px; } .activity-row { flex-wrap: wrap; } .activity-time { width: 100%; } }
+
+  /* ---------- Owner tab ---------- */
+  .own-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .own-head h2 { font-size: 20px; margin: 0; font-weight: 600; }
+  .own-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .own-tools .note { font-size: 11px; color: var(--ink-faint); }
+  .own-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 26px; }
+  .own-item { background: var(--card); border-radius: var(--radius-m); padding: 14px 15px; border-left: 3px solid var(--brass); }
+  .own-item.critical { border-left-color: var(--clay); }
+  .own-meta { font-size: 11px; color: var(--ink-soft); margin-bottom: 10px; line-height: 1.5; }
+  .own-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--ink-faint); }
+  .own-actions button { font-size: 11px; padding: 6px 12px; }
+  .own-clear { background: var(--card); border-radius: var(--radius-m); padding: 26px 18px; text-align: center; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 26px; }
+  .own-clear strong { display: block; font-size: 16px; color: var(--sage); margin-bottom: 4px; }
+  .own-panel { background: var(--card); border-radius: var(--radius-m); padding: 16px; margin-bottom: 18px; }
+  .own-panel h3 { font-size: 15px; font-weight: 500; margin: 0 0 4px; }
+  .own-panel .panel-sub { font-size: 11px; color: var(--ink-faint); margin-bottom: 14px; line-height: 1.5; }
+  .staff-row { display: grid; grid-template-columns: 1fr 96px auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .staff-row input[type="text"] { width: 100%; padding: 8px 9px; border: 1px solid var(--line); border-radius: var(--radius-s); background: var(--paper); color: var(--ink); font-size: 13px; }
+  .staff-row .st-active { font-size: 11.5px; color: var(--ink-soft); display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .panel-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+  .panel-actions .msg { font-size: 11px; color: var(--clay); }
+  .btn-quiet { font-size: 11.5px; padding: 7px 12px; color: var(--ink-soft); }
+  .btn-quiet:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .btn-solid { font-size: 12px; padding: 8px 16px; background: var(--sage); color: var(--paper); border: none; font-weight: 600; letter-spacing: 0.02em; }
+  .btn-solid:hover:not(:disabled) { background: var(--ink); }
+  .btn-solid:disabled { opacity: 0.5; }
+  :root[data-theme="dark"] .btn-solid { color: #1c1410; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-solid { color: #1c1410; } }
+  .btn-danger { font-size: 11.5px; padding: 7px 12px; color: var(--clay); border-color: var(--clay); background: transparent; }
+  .conn-list { font-size: 12px; color: var(--ink-soft); line-height: 1.9; }
+  .conn-list b { font-weight: 600; color: var(--ink); }
+
+  /* ---------- Modal + toasts ---------- */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(20, 12, 8, 0.5); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-m); padding: 20px; }
+  .modal h2 { margin: 0 0 4px; font-size: 19px; font-weight: 600; }
+  .modal-sub { font-size: 11.5px; color: var(--ink-soft); margin-bottom: 14px; line-height: 1.5; }
+  .modal .field { display: block; margin-bottom: 12px; }
+  .modal .field span { display: block; font-size: 11px; color: var(--ink-faint); margin-bottom: 5px; }
+  .modal .field input { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: var(--radius-s); background: var(--paper); color: var(--ink); font-size: 14px; }
+  .modal-diff { font-size: 11.5px; min-height: 16px; margin-bottom: 8px; color: var(--clay); }
+  .modal-diff.ok { color: var(--sage); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-foot { font-size: 10.5px; color: var(--ink-faint); margin-top: 12px; text-align: right; }
+  .toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 70; display: flex; flex-direction: column; gap: 8px; align-items: center; width: calc(100% - 32px); max-width: 420px; pointer-events: none; }
+  .toast { background: var(--ink); color: var(--paper); font-size: 12px; padding: 10px 14px; border-radius: var(--radius-m); box-shadow: 0 8px 22px var(--shadow); line-height: 1.45; pointer-events: auto; }
+  .toast.warn { background: var(--clay); color: #fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="brand-mark">Lurk</span>
+      <span class="brand-tag">counter &amp; stock</span>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Sections">
+      <button type="button" data-tab="order" class="active">Order</button>
+      <button type="button" data-tab="queue">Prep queue <span class="badge" id="queueBadge" hidden>0</span></button>
+      <button type="button" data-tab="storage">Storage <span class="badge" id="storageBadge" hidden>0</span></button>
+      <button type="button" data-tab="count">Closing count <span class="badge" id="countBadge" hidden>0</span></button>
+      <button type="button" data-tab="insights">Insights</button>
+      <button type="button" data-tab="owner" id="ownerTabBtn" hidden>Owner <span class="badge" id="ownerBadge" hidden>0</span></button>
+    </nav>
+    <div class="status-cluster">
+      <div class="staff-chip"><span class="avatar" id="staffAvatar">–</span><span id="staffName">Signed out</span></div>
+      <button type="button" class="ghost-btn" id="switchStaffBtn">Switch user</button>
+      <div class="sync-pill" id="syncPill" role="status" aria-live="polite"><span class="sync-dot"></span><span id="syncLabel">Connecting…</span></div>
+    </div>
+  </header>
+
+  <div class="alert-strip" id="alertStrip" hidden></div>
+
+  <section id="orderView">
+    <div class="order-layout">
+      <div>
+        <div class="cat-row" id="catRow"></div>
+        <div class="menu-grid" id="menuGrid"></div>
+      </div>
+
+      <div class="ticket">
+        <h2 class="serif" style="font-size:15px;">Current order <span id="ticketNum"></span></h2>
+        <div class="ticket-sub" id="ticketSub">tap an item to add it</div>
+        <div id="ticketLines"></div>
+        <div class="ticket-totals" id="ticketTotals"></div>
+
+        <div class="pay-block" id="payBlock" hidden>
+          <div class="pay-label">Payment method</div>
+          <div class="pay-methods" id="payMethods">
+            <button type="button" data-method="Cash" class="active">Cash</button>
+            <button type="button" data-method="Card">Card</button>
+            <button type="button" data-method="GCash">GCash</button>
+          </div>
+          <div id="cashArea">
+            <div class="cash-row"><input type="number" id="cashInput" placeholder="Cash received" inputmode="numeric" aria-label="Cash received"></div>
+            <div class="change-line" id="changeLine"></div>
+          </div>
+        </div>
+
+        <button type="button" class="send-btn" id="sendBtn" disabled>Add items to start an order</button>
+        <div class="ticket-error" id="ticketError" role="alert"></div>
+
+        <div class="recent-log">
+          <h3>Recent orders</h3>
+          <div id="logRows"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="queueView" hidden>
+    <div id="queueGrid"></div>
+  </section>
+
+  <section id="storageView" hidden>
+    <div id="supplierPanel"></div>
+    <div id="lowBanner"></div>
+    <div class="stock-grid" id="stockGrid"></div>
+
+    <div class="activity-block">
+      <h3 class="serif">Stock activity</h3>
+      <div class="activity-sub">Who added, received and used stock. Recent days only.</div>
+      <div class="filters">
+        <label>Who <select id="fWho"></select></label>
+        <label>Ingredient <select id="fIng"></select></label>
+        <label>Type
+          <select id="fType">
+            <option value="all">Everything</option>
+            <option value="restock">Added</option>
+            <option value="receive">Received</option>
+            <option value="sale">Used in sales</option>
+          </select>
+        </label>
+      </div>
+      <div class="activity-list" id="activityList"></div>
+      <button type="button" class="more-btn" id="moreBtn" hidden>Show more</button>
+    </div>
+  </section>
+
+  <section id="countView" hidden>
+    <div style="margin-bottom:14px;">
+      <h2 class="serif" style="font-size:19px;margin:0 0 4px;">Closing count</h2>
+      <div style="font-size:11.5px;color:var(--ink-faint);">Compare what's actually on the shelf to what the app expects, then submit. The app already tracks every sale as it happens — this is just tonight's reality check. Differences bigger than normal get flagged for the owner.</div>
+    </div>
+    <div id="countBox"></div>
+  </section>
+
+  <section id="insightsView" hidden>
+    <div class="range-row" id="rangeRow">
+      <button type="button" data-range="today" class="active">Today</button>
+      <button type="button" data-range="3d">Last 3 days</button>
+    </div>
+    <div class="insight-summary" id="insightSummary"></div>
+    <div class="insight-cols">
+      <div class="insight-block">
+        <h3 class="serif">Top sellers</h3>
+        <div id="topSellers"></div>
+      </div>
+      <div class="insight-block">
+        <h3 class="serif">Payment methods</h3>
+        <div id="payBreakdown"></div>
+      </div>
+    </div>
+    <div class="insight-block">
+      <h3 class="serif">Stock handled by staff</h3>
+      <div id="staffSummary"></div>
+    </div>
+  </section>
+
+  <section id="ownerView" hidden>
+    <div class="own-head">
+      <h2 class="serif">Needs your attention</h2>
+      <div class="own-tools">
+        <span class="note" id="notifNote"></span>
+        <button type="button" class="btn-quiet" id="notifBtn" hidden>Turn on browser alerts</button>
+        <button type="button" class="btn-solid" id="ackAllBtn" hidden>Acknowledge all</button>
+      </div>
+    </div>
+    <div id="ownBoard"></div>
+
+    <div class="own-panel">
+      <h3 class="serif">Closing counts</h3>
+      <div class="panel-sub">What staff counted at close, compared to what the app expected.</div>
+      <div id="ownCountsList"></div>
+    </div>
+
+    <div class="own-panel">
+      <h3 class="serif">Staff</h3>
+      <div class="panel-sub">Staff pick their name and enter this PIN to start their shift. Their name is saved on every sale, restock and delivery they handle. PINs identify who did what; they are not a security lock.</div>
+      <div id="staffEditor"></div>
+      <div class="panel-actions">
+        <button type="button" class="btn-quiet" id="addStaffBtn">Add staff</button>
+        <button type="button" class="btn-solid" id="saveStaffBtn">Save staff</button>
+        <span class="msg" id="staffMsg" role="alert"></span>
+      </div>
+    </div>
+
+    <div class="own-panel">
+      <h3 class="serif">Connection</h3>
+      <div class="conn-list" id="connInfo"></div>
+    </div>
+
+    <div class="own-panel">
+      <h3 class="serif">Reset demo data</h3>
+      <div class="panel-sub">Puts every ingredient back to its starting level and clears orders, alerts and supplier orders on every device. Staff and their PINs stay.</div>
+      <button type="button" class="btn-danger" id="resetBtn">Reset demo data</button>
+    </div>
+  </section>
+
+  <footer class="note" id="footNote"></footer>
+</div>
+
+<div class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginBrand">
+  <div class="login-card" id="loginCard"></div>
+</div>
+<div id="modalRoot"></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =====================================================================
+     Constants
+     ===================================================================== */
+  var LOCAL_KEY = "emberleaf-pos-v3-local";
+  var OUTBOX_KEY = "emberleaf-pos-v3-outbox";
+  var RANK = { ok: 0, low: 1, critical: 2 };
+
+  var STAGE_ORDER_MS = 2500;      // simulated supplier: placing the order
+  var STAGE_TRANSIT_MS = 8000;    // simulated supplier: in transit until this age, then "arrived"
+  var RETAIN_MS = 3 * 86400000;   // keep 3 days of detail; older detail is folded into a baseline
+  var COMPACT_OVER = 1500, COMPACT_TO = 1000, COMPACT_GUARD_MS = 6 * 3600000, COMPACT_BATCH = 120;
+  var IDLE_LOCK_MS = 10 * 60 * 1000;
+
+  var ING = {
+    beans:      { name: "Espresso beans",    unit: "g",   start: 1200, capacity: 2000, low: 500,  critical: 200, reorder: 1000 },
+    milk:       { name: "Whole milk",        unit: "ml",  start: 3800, capacity: 6000, low: 1200, critical: 500, reorder: 3000 },
+    oatmilk:    { name: "Oat milk",          unit: "ml",  start: 900,  capacity: 3000, low: 800,  critical: 300, reorder: 2000 },
+    hojicha:    { name: "Hojicha powder",    unit: "g",   start: 320,  capacity: 800,  low: 200,  critical: 80,  reorder: 500 },
+    matcha:     { name: "Matcha powder",     unit: "g",   start: 400,  capacity: 1000, low: 250,  critical: 100, reorder: 500 },
+    horchata:   { name: "Horchata base",     unit: "ml",  start: 2000, capacity: 4000, low: 800,  critical: 300, reorder: 2000 },
+    coldbrew:   { name: "Cold brew concentrate", unit: "ml", start: 1500, capacity: 3000, low: 600, critical: 250, reorder: 1500 },
+    peanutbutter:{ name: "Peanut butter",    unit: "g",   start: 600,  capacity: 1500, low: 300,  critical: 100, reorder: 800 },
+    orangesyrup:{ name: "Orange syrup",      unit: "ml",  start: 400,  capacity: 800,  low: 150,  critical: 60,  reorder: 400 },
+    plumsyrup:  { name: "Red plum syrup",    unit: "ml",  start: 400,  capacity: 800,  low: 150,  critical: 60,  reorder: 400 },
+    sakurasyrup:{ name: "Sakura syrup",      unit: "ml",  start: 400,  capacity: 800,  low: 150,  critical: 60,  reorder: 400 },
+    earlgrey:   { name: "Earl grey syrup",   unit: "ml",  start: 300,  capacity: 600,  low: 100,  critical: 40,  reorder: 300 },
+    saltedcream:{ name: "Salted cream",      unit: "ml",  start: 500,  capacity: 1000, low: 200,  critical: 80,  reorder: 500 },
+    coconut:    { name: "Toasted coconut",   unit: "g",   start: 150,  capacity: 400,  low: 80,   critical: 30,  reorder: 200 },
+    berrypuree: { name: "Berry puree",       unit: "ml",  start: 800,  capacity: 2000, low: 300,  critical: 120, reorder: 1000 },
+    peachpuree: { name: "Peach puree",       unit: "ml",  start: 800,  capacity: 2000, low: 300,  critical: 120, reorder: 1000 },
+    cupsS:      { name: "Small cups",        unit: "pcs", start: 70,   capacity: 150,  low: 30,   critical: 12,  reorder: 100 },
+    cupsL:      { name: "Large cups",        unit: "pcs", start: 55,   capacity: 150,  low: 30,   critical: 12,  reorder: 100 },
+    eggs:       { name: "Eggs",              unit: "pcs", start: 60,   capacity: 150,  low: 30,   critical: 12,  reorder: 80 },
+    rice:       { name: "Rice",              unit: "g",   start: 3000, capacity: 6000, low: 1000, critical: 400, reorder: 3000 },
+    beef:       { name: "Beef slices",       unit: "g",   start: 1500, capacity: 3000, low: 500,  critical: 200, reorder: 1500 },
+    ciabatta:   { name: "Ciabatta bread",    unit: "pcs", start: 20,   capacity: 50,   low: 10,   critical: 4,   reorder: 30 },
+    cheese:     { name: "Cheese slices",     unit: "pcs", start: 40,   capacity: 100,  low: 15,   critical: 6,   reorder: 50 },
+    bacon:      { name: "Bacon strips",      unit: "g",   start: 800,  capacity: 2000, low: 300,  critical: 120, reorder: 1000 },
+    marinara:   { name: "Marinara sauce",    unit: "ml",  start: 1500, capacity: 3000, low: 500,  critical: 200, reorder: 1500 },
+    pastanoodles:{ name: "Pasta noodles",    unit: "g",   start: 1500, capacity: 3000, low: 500,  critical: 200, reorder: 1500 },
+    pancakemix: { name: "Pancake batter",    unit: "g",   start: 1500, capacity: 3000, low: 500,  critical: 200, reorder: 1500 },
+    buttercream:{ name: "Buttercream",       unit: "g",   start: 800,  capacity: 2000, low: 300,  critical: 120, reorder: 1000 },
+    fries:      { name: "Crisscut fries",    unit: "g",   start: 2000, capacity: 4000, low: 600,  critical: 250, reorder: 2000 },
+    cookies:    { name: "Dubai chewy cookies", unit: "pcs", start: 20, capacity: 50,   low: 10,   critical: 4,   reorder: 30 },
+    brownies:   { name: "Pistachio brownies", unit: "pcs", start: 20, capacity: 50,   low: 10,   critical: 4,   reorder: 30 }
+  };
+
+  var MENU = [
+    { id: "longblack",  name: "Long black",       cat: "Coffee",     price: 140, recipe: { beans: 18, cupsS: 1 } },
+    { id: "cortado",    name: "Cortado",          cat: "Coffee",     price: 150, recipe: { beans: 18, milk: 60, cupsS: 1 } },
+    { id: "cafelatte",  name: "Cafe latte",       cat: "Coffee",     price: 170, recipe: { beans: 18, milk: 200, cupsL: 1 } },
+    { id: "cappuccino", name: "Cappuccino",       cat: "Coffee",     price: 170, recipe: { beans: 18, milk: 150, cupsL: 1 } },
+    { id: "spanishlatte", name: "Spanish latte",  cat: "Coffee",     price: 180, recipe: { beans: 18, milk: 180, cupsL: 1 } },
+    { id: "honeyoatlatte", name: "Honey oat latte", cat: "Coffee",   price: 190, recipe: { beans: 18, oatmilk: 200, cupsL: 1 } },
+    { id: "marikitlatte", name: "Marikit latte",  cat: "Coffee",     price: 200, recipe: { beans: 18, horchata: 120, milk: 60, coconut: 5, cupsL: 1 } },
+    { id: "asintibuok", name: "Asin tibuok latte", cat: "Coffee",    price: 190, recipe: { beans: 18, milk: 160, saltedcream: 20, cupsL: 1 } },
+    { id: "pblatte",    name: "Peanut butter latte", cat: "Coffee",  price: 190, recipe: { beans: 18, milk: 180, peanutbutter: 20, cupsL: 1 } },
+    { id: "flamedorange", name: "Flamed orange",  cat: "Coffee",     price: 190, recipe: { beans: 18, orangesyrup: 30, cupsL: 1 } },
+    { id: "plumcoldbrew", name: "Red plum cold brew", cat: "Coffee", price: 190, recipe: { coldbrew: 250, plumsyrup: 30, cupsL: 1 } },
+    { id: "eggbrulee",  name: "Egg brulée coffee", cat: "Coffee",    price: 210, recipe: { beans: 18, milk: 150, eggs: 1, cupsL: 1 } },
+    { id: "pourover",   name: "Pourover",         cat: "Coffee",     price: 200, recipe: { beans: 22, cupsL: 1 } },
+    { id: "hojichalatte", name: "Hojicha latte",  cat: "Hojicha",    price: 195, recipe: { hojicha: 8, milk: 200, cupsL: 1 } },
+    { id: "pbhojicha",  name: "Peanut butter hojicha", cat: "Hojicha", price: 200, recipe: { hojicha: 8, milk: 180, peanutbutter: 20, cupsL: 1 } },
+    { id: "moonfoldcha", name: "Moonfold cha",    cat: "Matcha",     price: 200, recipe: { matcha: 6, milk: 150, earlgrey: 20, cupsL: 1 } },
+    { id: "matchalatte", name: "Matcha latte",    cat: "Matcha",     price: 195, recipe: { matcha: 6, milk: 200, cupsL: 1 } },
+    { id: "seasaltmatcha", name: "Seasalt matcha", cat: "Matcha",    price: 200, recipe: { matcha: 6, milk: 180, saltedcream: 20, cupsL: 1 } },
+    { id: "sakuramatcha", name: "Sakura matcha",  cat: "Matcha",     price: 210, recipe: { matcha: 6, milk: 180, sakurasyrup: 25, cupsL: 1 } },
+    { id: "matchabrulee", name: "Matcha egg brulée", cat: "Matcha",  price: 220, recipe: { matcha: 6, milk: 150, eggs: 1, cupsL: 1 } },
+    { id: "classichorchata", name: "Classic horchata", cat: "Horchata", price: 170, recipe: { horchata: 250, cupsL: 1 } },
+    { id: "dirtyhorchata", name: "Dirty horchata", cat: "Horchata",  price: 195, recipe: { horchata: 220, beans: 18, cupsL: 1 } },
+    { id: "twinfruitberry", name: "Twinfruit berry", cat: "Refreshers", price: 190, recipe: { berrypuree: 180, cupsL: 1 } },
+    { id: "lowtidepeach", name: "Lowtide peach",  cat: "Refreshers", price: 190, recipe: { peachpuree: 180, cupsL: 1 } },
+    { id: "gyudon",     name: "Gyudon",           cat: "Food",       price: 230, recipe: { beef: 150, rice: 200, eggs: 1 } },
+    { id: "grilledcheese", name: "Grilled cheese w/ marinara dip", cat: "Food", price: 220, recipe: { ciabatta: 2, cheese: 2, marinara: 40 } },
+    { id: "baconeggtoast", name: "Bacon and egg toast", cat: "Food", price: 220, recipe: { ciabatta: 2, bacon: 60, eggs: 2 } },
+    { id: "pastamarinara", name: "Pasta marinara", cat: "Food",      price: 230, recipe: { pastanoodles: 180, marinara: 150 } },
+    { id: "matchapancake", name: "Matcha buttercream pancake", cat: "Food", price: 200, recipe: { pancakemix: 220, buttercream: 40, matcha: 5 } },
+    { id: "maplepancake", name: "Maple cinnamon buttercream pancake", cat: "Food", price: 190, recipe: { pancakemix: 220, buttercream: 40 } },
+    { id: "crisscutfries", name: "Crisscut fries", cat: "Food",      price: 220, recipe: { fries: 250 } },
+    { id: "dubaicookie", name: "Dubai chewy cookie", cat: "Sweets",  price: 170, recipe: { cookies: 1 } },
+    { id: "pistachiobrownie", name: "Pistachio brownie", cat: "Sweets", price: 170, recipe: { brownies: 1 } }
+  ];
+  var CATS = ["All", "Coffee", "Hojicha", "Matcha", "Horchata", "Refreshers", "Food", "Sweets"];
+
+  // Placeholder staff. The owner edits these in the Owner tab; the edited list is saved to the shared database.
+  var DEFAULT_STAFF = [
+    { id: "s_maya", name: "Maya", pin: "1111", active: true },
+    { id: "s_ken",  name: "Ken",  pin: "2222", active: true },
+    { id: "s_ana",  name: "Ana",  pin: "3333", active: true }
+  ];
+
+  /* =====================================================================
+     Small helpers
+     ===================================================================== */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function fmtNum(n) { return Number(n).toLocaleString("en-US"); }
+  function peso(n) { return "₱" + fmtNum(Math.round(n)); }
+  function pad3(n) { return String(n).padStart(3, "0"); }
+  function newId() { return "e" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function fmtTime(ts) {
+    var d = new Date(ts), now = new Date();
+    var t = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    if (d.toDateString() === now.toDateString()) return t;
+    return d.toLocaleDateString([], { month: "short", day: "numeric" }) + ", " + t;
+  }
+  function ago(ts) {
+    var s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+    if (s < 60) return "just now";
+    var m = Math.round(s / 60);
+    if (m < 60) return m + " min ago";
+    var h = Math.round(m / 60);
+    if (h < 24) return h + " h ago";
+    return Math.round(h / 24) + " d ago";
+  }
+  function withTimeout(p, ms) {
+    return Promise.race([p, new Promise(function (_, rej) { setTimeout(function () { rej({ timeout: true }); }, ms); })]);
+  }
+  function defaultLevels() { var o = {}; for (var k in ING) o[k] = ING[k].start; return o; }
+  function dateKey(ts) { return new Date(ts).toDateString(); }
+  function countThreshold(k) { return Math.max(1, Math.round(ING[k].low * 0.3)); }
+  function statusOf(k, level) {
+    var i = ING[k];
+    return level <= i.critical ? "critical" : level <= i.low ? "low" : "ok";
+  }
+
+  // localStorage can be blocked (previews, private mode): every call is guarded.
+  var LS = {
+    get: function (k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* keep going in memory */ } }
+  };
+
+  /* =====================================================================
+     Data layer
+     ---------------------------------------------------------------------
+     Everything shared lives in an append-only ledger: each sale, restock
+     and delivery is its own small document with stock changes ("deltas").
+     Current stock = baseline + the sum of ledger deltas, so two devices
+     writing at the same moment can never overwrite each other's stock.
+
+       ledger/{id}      sale | restock | receive entries (who, what, when)
+       open/{ingredient}  the supplier order currently in flight
+       alerts/{ingredient} when it went low + owner acknowledgement
+       config/staff     staff names and PINs (editors only)
+       meta/baseline    folded history so the database stays small
+     ===================================================================== */
+  var deviceId = "dev_" + Math.random().toString(36).slice(2, 9);
+  var sync = { mode: "connecting", db: null, ready: {}, err: null };
+  var READY_KEYS = ["ledger", "open", "alerts", "counts", "staff", "baseline"];
+  var remote = emptyRemote();   // what the shared database (or this device, in local mode) holds
+  var outbox = [];              // writes not yet confirmed by the database
+  var data = null;              // remote + outbox, i.e. what this device believes right now
+  var view = null;              // numbers derived from data
+  var flags = { owner: false };
+  var flushing = false, retryTimer = null;
+
+  function emptyRemote() { return { ledger: {}, open: {}, alerts: {}, counts: {}, staff: null, baseline: null }; }
+  function isReady() {
+    if (sync.mode === "local") return true;
+    if (sync.mode !== "live") return false;
+    return READY_KEYS.every(function (k) { return sync.ready[k]; });
+  }
+  function isOwnerView() { return flags.owner || sync.mode === "local"; }
+
+  function applyOp(d, op) {
+    var parts = op.p.split("/"), col = parts[0], id = parts[1];
+    if (col === "config") { if (id === "staff") d.staff = op.k === "delete" ? null : op.d; return; }
+    if (col === "meta") { if (id === "baseline") d.baseline = op.k === "delete" ? null : op.d; return; }
+    var bucket = d[col];
+    if (!bucket) return;
+    if (op.k === "delete") delete bucket[id];
+    else if (op.k === "set") bucket[id] = op.d;
+    else if (op.k === "update" && bucket[id]) bucket[id] = Object.assign({}, bucket[id], op.d);
+  }
+  function buildData() {
+    var d = {
+      ledger: Object.assign({}, remote.ledger), open: Object.assign({}, remote.open),
+      alerts: Object.assign({}, remote.alerts), counts: Object.assign({}, remote.counts),
+      staff: remote.staff, baseline: remote.baseline
+    };
+    outbox.forEach(function (op) { applyOp(d, op); });
+    return d;
+  }
+
+  // Every change goes through write(): it shows up on this device instantly, then reaches the database.
+  function write(k, path, d) {
+    var op = { k: k, p: path, d: d === undefined ? null : d };
+    outbox.push(op);
+    applyOp(data, op);
+    if (sync.mode === "live") LS.set(OUTBOX_KEY, outbox);
+    flush();
+    scheduleRender();
+  }
+
+  function sendOp(op) {
+    var ref = sync.db.doc(op.p);
+    if (op.k === "set") return ref.set(op.d);
+    if (op.k === "update") return ref.update(op.d);
+    return ref.delete();
+  }
+
+  function flush() {
+    if (sync.mode === "local") {
+      if (outbox.length) {
+        outbox.splice(0).forEach(function (op) { applyOp(remote, op); });
+        LS.set(LOCAL_KEY, remote);
+      }
+      return Promise.resolve();
+    }
+    if (sync.mode !== "live" || flushing || !outbox.length) return Promise.resolve();
+    flushing = true;
+    renderChrome();
+    return (async function () {
+      try {
+        while (outbox.length && navigator.onLine !== false) {
+          var op = outbox[0];
+          try {
+            await withTimeout(sendOp(op), 15000);
+            outbox.shift();
+            LS.set(OUTBOX_KEY, outbox);
+          } catch (e) {
+            var code = e && e.code;
+            if (code === "unavailable" || code === "resource_exhausted" || (e && e.timeout)) { armRetry(); break; }
+            outbox.shift();                 // a permanent failure must not block the queue
+            LS.set(OUTBOX_KEY, outbox);
+            data = buildData();
+            syncFailure(e, op);
+          }
+        }
+      } finally {
+        flushing = false;
+        scheduleRender();
+      }
+    })();
+  }
+  function armRetry() {
+    if (retryTimer) return;
+    retryTimer = setTimeout(function () { retryTimer = null; flush(); }, 3000 + Math.random() * 3000);
+  }
+  function syncFailure(e, op) {
+    var code = e && e.code;
+    if (code === "quota_exceeded") toast("Shared storage is full. Ask the owner to reset old demo data.", "warn");
+    else if (op.p.indexOf("config/") === 0) toast("Couldn't save staff changes. Only editors can change staff.", "warn");
+    else toast("A change couldn't be saved to the shared database.", "warn");
+  }
+
+  function onRemote() {
+    data = buildData();
+    if (outbox.length && sync.mode === "live") flush();
+    scheduleRender();
+  }
+
+  function enterLocal() {
+    sync.mode = "local";
+    var saved = LS.get(LOCAL_KEY);
+    remote = emptyRemote();
+    if (saved) {
+      remote.ledger = saved.ledger || {}; remote.open = saved.open || {}; remote.alerts = saved.alerts || {};
+      remote.counts = saved.counts || {};
+      remote.staff = saved.staff || null; remote.baseline = saved.baseline || null;
+    }
+    outbox = [];
+    data = buildData();
+    renderLoginIfOpen();
+    scheduleRender();
+  }
+
+  function enterLive(db) {
+    sync.mode = "live";
+    sync.db = db;
+    remote = emptyRemote();
+    outbox = LS.get(OUTBOX_KEY) || [];
+    data = buildData();
+
+    function failed(name) {
+      return function (e) { sync.err = (e && e.code) || "unavailable"; scheduleRender(); };
+    }
+    function watchCollection(name) {
+      db.collection(name).onSnapshot(function (qs) {
+        var m = {};
+        qs.docs.forEach(function (d) { m[d.id] = d.data(); });
+        remote[name] = m; sync.ready[name] = true; sync.err = null; onRemote(); renderLoginIfOpen();
+      }, failed(name));
+    }
+    function watchDoc(path, key) {
+      db.doc(path).onSnapshot(function (s) {
+        remote[key] = s.exists ? s.data() : null; sync.ready[key] = true; sync.err = null; onRemote(); renderLoginIfOpen();
+      }, failed(key));
+    }
+    watchCollection("ledger"); watchCollection("open"); watchCollection("alerts"); watchCollection("counts");
+    watchDoc("config/staff", "staff"); watchDoc("meta/baseline", "baseline");
+
+    setTimeout(function () {
+      if (!isReady()) toast("Can't reach the shared data yet. Check your connection.", "warn");
+    }, 12000);
+    scheduleRender();
+  }
+
+  async function initCloud() {
+    if (!(window.claude && typeof window.claude.use === "function")) { enterLocal(); return; }
+    var db = null, user = null;
+    try {
+      var got = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+      db = got[0]; user = got[1];
+    } catch (e) { db = null; }
+    if (!db) { enterLocal(); return; }
+    try { flags.owner = user ? !!(await user.isOwner()) : false; } catch (e) { flags.owner = false; }
+    enterLive(db);
+  }
+
+  /* =====================================================================
+     Derived numbers
+     ===================================================================== */
+  function stageOf(o) {
+    var age = Date.now() - o.ts;
+    return age < STAGE_ORDER_MS ? "ordering" : age < STAGE_TRANSIT_MS ? "transit" : "arrived";
+  }
+
+  function derive() {
+    var base = { levels: {}, throughTs: 0, lastNum: 0 };
+    if (data.baseline) Object.assign(base, data.baseline);
+    var raw = Object.assign(defaultLevels(), base.levels || {});
+
+    var entries = [];
+    for (var id in data.ledger) {
+      var e = data.ledger[id];
+      if (!e || typeof e.ts !== "number" || e.ts <= base.throughTs) continue;
+      entries.push(Object.assign({ id: id }, e));
+    }
+    entries.sort(function (a, b) { return b.ts - a.ts; });
+    entries.forEach(function (e) {
+      var d = e.deltas || {};
+      for (var k in d) if (k in raw) raw[k] += Number(d[k]) || 0;
+    });
+
+    var shown = {}, status = {};
+    for (var k in ING) { shown[k] = Math.max(0, raw[k]); status[k] = statusOf(k, shown[k]); }
+
+    var sales = entries.filter(function (e) { return e.kind === "sale"; });
+    var lastNum = base.lastNum || 0;
+    sales.forEach(function (s) { if (s.num > lastNum) lastNum = s.num; });
+
+    var openOrders = [];
+    for (var ok in data.open) {
+      var o = data.open[ok];
+      if (!o || !(ok in ING) || typeof o.ts !== "number") continue;
+      if (data.ledger["rcv_" + ok + "_" + o.ts]) continue;   // already checked in
+      openOrders.push(Object.assign({ k: ok }, o, { stage: stageOf(o) }));
+    }
+
+    var alertItems = [];
+    for (var ak in ING) {
+      if (status[ak] === "ok") continue;
+      var a = data.alerts[ak] || null;
+      var ack = a && a.ack ? a.ack : null;
+      alertItems.push({
+        k: ak, status: status[ak], level: shown[ak],
+        since: a && a.level !== "ok" && a.since ? a.since : null,
+        ack: ack,
+        unacked: !ack || RANK[ack.level] < RANK[status[ak]],
+        order: openOrders.filter(function (x) { return x.k === ak; })[0] || null
+      });
+    }
+    alertItems.sort(function (a, b) { return RANK[b.status] - RANK[a.status]; });
+
+    var pendingIds = {};
+    outbox.forEach(function (op) { if (op.k === "set" && op.p.indexOf("ledger/") === 0) pendingIds[op.p.slice(7)] = true; });
+
+    var countDocs = Object.keys(data.counts).map(function (id) { return Object.assign({ id: id }, data.counts[id]); })
+      .filter(function (c) { return typeof c.ts === "number"; }).sort(function (a, b) { return b.ts - a.ts; });
+    var today = dateKey(Date.now());
+    var todayCount = countDocs.filter(function (c) { return c.date === today; })[0] || null;
+    var unackedCounts = countDocs.filter(function (c) { return (c.flagged || []).length && !c.ack; });
+
+    return { base: base, entries: entries, sales: sales, raw: raw, shown: shown, status: status,
+             nextNum: lastNum + 1, openOrders: openOrders, alertItems: alertItems, pendingIds: pendingIds,
+             countDocs: countDocs, todayCount: todayCount, unackedCounts: unackedCounts };
+  }
+
+  function hasOpenOrder(k) {
+    var o = data.open[k];
+    return !!o && !data.ledger["rcv_" + k + "_" + o.ts];
+  }
+  function makableCount(item) {
+    var min = Infinity;
+    for (var k in item.recipe) min = Math.min(min, Math.floor(view.shown[k] / item.recipe[k]));
+    return min;
+  }
+
+  /* =====================================================================
+     Staff + sessions
+     ===================================================================== */
+  var session = { staff: null };
+  var idleTimer = null;
+
+  function staffList() { return data && data.staff && Array.isArray(data.staff.list) ? data.staff.list : DEFAULT_STAFF; }
+  function activeStaff() { return staffList().filter(function (s) { return s.active !== false; }); }
+  function staffName(id) {
+    if (id === "owner") return "Owner";
+    if (id === "auto") return "Auto-order";
+    var s = staffList().filter(function (x) { return x.id === id; })[0];
+    return s ? s.name : "Former staff";
+  }
+  function actorId() { return session.staff ? session.staff.id : "owner"; }
+  function namesSig() { return JSON.stringify(staffList().map(function (s) { return [s.id, s.name]; })); }
+  function canWrite() { return !!session.staff && isReady(); }
+
+  function bumpIdle() {
+    clearTimeout(idleTimer);
+    if (session.staff) idleTimer = setTimeout(lockSession, IDLE_LOCK_MS);
+  }
+  function lockSession() {
+    session.staff = null;
+    clearTimeout(idleTimer);
+    closeModal();
+    showLogin();
+    scheduleRender();
+  }
+
+  /* =====================================================================
+     Login
+     ===================================================================== */
+  var loginState = { stage: "pick", staff: null, pin: "" };
+
+  function showLogin() {
+    loginState = { stage: "pick", staff: null, pin: "" };
+    $("loginOverlay").hidden = false;
+    renderLogin();
+  }
+  function renderLoginIfOpen() {
+    if (!$("loginOverlay").hidden && loginState.stage === "pick") renderLogin();
+  }
+  function renderLogin() {
+    var card = $("loginCard");
+    if (loginState.stage === "pick") {
+      var html = '<div class="login-brand serif" id="loginBrand">Lurk</div><div class="login-sub">Who is on the counter?</div>';
+      if (sync.mode === "connecting" || (sync.mode === "live" && !isReady())) {
+        html += '<div class="login-note">Loading staff…</div>';
+      } else {
+        html += '<div class="staff-pick" id="staffPick">';
+        activeStaff().forEach(function (s) {
+          html += '<button type="button" data-staff="' + esc(s.id) + '"><span class="avatar">' + esc((s.name || "?").charAt(0).toUpperCase()) + '</span>' + esc(s.name) + '</button>';
+        });
+        if (isOwnerView()) {
+          html += '<button type="button" data-staff="owner"><span class="avatar">O</span>Owner<span class="role">no PIN needed</span></button>';
+        }
+        html += "</div>";
+        if (!activeStaff().length && !isOwnerView()) html += '<div class="login-note">No staff are set up yet. Ask the owner to add staff in the Owner tab.</div>';
+      }
+      card.innerHTML = html;
+      var first = card.querySelector("button");
+      if (first) first.focus();
+    } else {
+      var s = loginState.staff;
+      var pad = "";
+      [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (n) { pad += '<button type="button" data-d="' + n + '">' + n + "</button>"; });
+      pad += '<button type="button" class="blank" tabindex="-1" aria-hidden="true">.</button><button type="button" data-d="0">0</button><button type="button" data-d="back" aria-label="Delete last digit">⌫</button>';
+      card.innerHTML =
+        '<div class="login-brand serif" id="loginBrand">Lurk</div>' +
+        '<div class="pin-name">Hi, ' + esc(s.name) + '. Enter your PIN.</div>' +
+        '<button type="button" class="pin-back" id="pinBack">Not you? Go back</button>' +
+        '<div class="pin-dots" id="pinDots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>' +
+        '<div class="pin-pad" id="pinPad">' + pad + '</div>' +
+        '<div class="pin-error" id="pinError" role="alert"></div>';
+    }
+  }
+  function updatePinDots() {
+    var dots = document.querySelectorAll("#pinDots span");
+    for (var i = 0; i < dots.length; i++) dots[i].classList.toggle("filled", i < loginState.pin.length);
+  }
+  function loginSuccess(s) {
+    session.staff = { id: s.id, name: s.name };
+    $("loginOverlay").hidden = true;
+    bumpIdle();
+    scheduleRender();
+  }
+  function pinPress(d) {
+    if (d === "back") loginState.pin = loginState.pin.slice(0, -1);
+    else if (loginState.pin.length < 4) loginState.pin += d;
+    $("pinError").textContent = "";
+    updatePinDots();
+    if (loginState.pin.length === 4) {
+      var s = loginState.staff;
+      if (String(s.pin) === loginState.pin) { loginSuccess(s); }
+      else {
+        loginState.pin = "";
+        setTimeout(function () { updatePinDots(); $("pinError").textContent = "That PIN doesn't match. Try again."; }, 120);
+      }
+    }
+  }
+  $("loginCard").addEventListener("click", function (e) {
+    var pick = e.target.closest("button[data-staff]");
+    if (pick) {
+      var id = pick.getAttribute("data-staff");
+      if (id === "owner") { loginSuccess({ id: "owner", name: "Owner" }); return; }
+      var s = activeStaff().filter(function (x) { return x.id === id; })[0];
+      if (!s) return;
+      loginState = { stage: "pin", staff: s, pin: "" };
+      renderLogin();
+      return;
+    }
+    if (e.target.closest("#pinBack")) { showLogin(); return; }
+    var d = e.target.closest("button[data-d]");
+    if (d) pinPress(d.getAttribute("data-d"));
+  });
+  document.addEventListener("keydown", function (e) {
+    if ($("loginOverlay").hidden || loginState.stage !== "pin") return;
+    if (/^[0-9]$/.test(e.key)) { pinPress(e.key); e.preventDefault(); }
+    else if (e.key === "Backspace") { pinPress("back"); e.preventDefault(); }
+    else if (e.key === "Escape") { showLogin(); }
+  });
+  ["pointerdown", "keydown"].forEach(function (ev) { document.addEventListener(ev, bumpIdle, true); });
+  $("switchStaffBtn").addEventListener("click", lockSession);
+
+  /* =====================================================================
+     Toasts + modal
+     ===================================================================== */
+  function toast(msg, kind) {
+    var t = el("div", "toast" + (kind ? " " + kind : ""));
+    t.textContent = msg;
+    $("toasts").appendChild(t);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 7000);
+  }
+
+  var modalOpener = null;
+  function closeModal() {
+    $("modalRoot").innerHTML = "";
+    if (modalOpener && document.body.contains(modalOpener)) { try { modalOpener.focus(); } catch (e) {} }
+    modalOpener = null;
+  }
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && $("modalRoot").firstChild) closeModal(); });
+
+  function openStockModal(kind, k, order) {
+    if (!canWrite()) { toast(session.staff ? "Still loading shared data. Try again in a moment." : "Sign in first.", "warn"); return; }
+    var ing = ING[k], isRcv = kind === "receive";
+    modalOpener = document.activeElement;
+    var defQty = isRcv ? order.amount : ing.reorder;
+    var back = el("div", "modal-backdrop");
+    back.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">' +
+        '<h2 class="serif" id="mTitle">' + (isRcv ? "Check in delivery" : "Add stock") + "</h2>" +
+        '<div class="modal-sub">' + esc(ing.name) + " · now " + fmtNum(view.shown[k]) + " of " + fmtNum(ing.capacity) + " " + ing.unit +
+          (isRcv ? "<br>Ordered: " + fmtNum(order.amount) + " " + ing.unit : "") + "</div>" +
+        '<label class="field"><span>' + (isRcv ? "Quantity received" : "Quantity to add") + " (" + ing.unit + ')</span>' +
+          '<input type="number" id="mQty" min="1" step="1" inputmode="numeric" value="' + defQty + '"></label>' +
+        '<label class="field"><span>Note (optional)</span><input type="text" id="mNote" maxlength="80" placeholder="' + (isRcv ? "e.g. two boxes damaged" : "e.g. bought at the market") + '"></label>' +
+        '<div class="modal-diff" id="mDiff" role="status"></div>' +
+        '<div class="modal-actions"><button type="button" class="btn-quiet" id="mCancel">Cancel</button>' +
+          '<button type="button" class="btn-solid" id="mOk">' + (isRcv ? "Confirm received" : "Add to stock") + "</button></div>" +
+        '<div class="modal-foot">Saved under ' + esc(session.staff.name) + "</div>" +
+      "</div>";
+    $("modalRoot").innerHTML = "";
+    $("modalRoot").appendChild(back);
+    var qty = $("mQty"), diff = $("mDiff");
+    qty.focus(); qty.select();
+
+    function readQty() { var n = Math.round(Number(qty.value)); return isFinite(n) ? n : 0; }
+    function showDiff() {
+      var n = readQty();
+      diff.className = "modal-diff";
+      if (!isRcv) { diff.textContent = ""; return; }
+      if (n > 0 && n !== order.amount) diff.textContent = "Differs from the order by " + (n > order.amount ? "+" : "−") + fmtNum(Math.abs(n - order.amount)) + " " + ing.unit + ". This will be flagged.";
+      else { diff.textContent = ""; }
+    }
+    qty.addEventListener("input", showDiff);
+    $("mCancel").addEventListener("click", closeModal);
+    back.addEventListener("mousedown", function (e) { if (e.target === back) closeModal(); });
+    $("mOk").addEventListener("click", function () {
+      var n = readQty();
+      if (n < 1 || n > ing.capacity * 3) { diff.className = "modal-diff"; diff.textContent = "Enter a whole number between 1 and " + fmtNum(ing.capacity * 3) + "."; return; }
+      commitStock(kind, k, n, $("mNote").value.trim(), order);
+      closeModal();
+    });
+  }
+
+  /* =====================================================================
+     Stock actions
+     ===================================================================== */
+  function reconcile(prev, next) {
+    var now = Date.now();
+    for (var k in ING) {
+      var ps = statusOf(k, prev[k]), ns = statusOf(k, next[k]);
+      if (ps === ns) continue;
+      var cur = data.alerts[k] || null;
+      if (RANK[ns] > 0) {
+        var worse = RANK[ns] > RANK[ps];
+        write("set", "alerts/" + k, {
+          ing: k, level: ns, stock: next[k], ts: now,
+          since: cur && cur.level !== "ok" && cur.since ? cur.since : now,
+          ack: worse ? null : (cur && cur.ack ? cur.ack : null),
+          by: actorId()
+        });
+        if (!hasOpenOrder(k)) write("set", "open/" + k, { ing: k, amount: ING[k].reorder, ts: now, by: "auto" });
+      } else {
+        write("set", "alerts/" + k, { ing: k, level: "ok", stock: next[k], ts: now, since: null, ack: null, by: actorId() });
+      }
+    }
+  }
+
+  function commitStock(kind, k, qty, note, order) {
+    var prev = clone(view.shown);
+    var now = Date.now();
+    var entry = { ts: now, kind: kind, by: actorId(), ing: k, qty: qty, note: note || "", deltas: {} };
+    entry.deltas[k] = qty;
+    var id = newId();
+    if (kind === "receive") {
+      entry.ordered = order.amount;
+      entry.orderTs = order.ts;
+      id = "rcv_" + k + "_" + order.ts;      // same id from every device, so a delivery can only be counted once
+    }
+    write("set", "ledger/" + id, entry);
+    if (kind === "receive") write("delete", "open/" + k);
+    var next = clone(prev);
+    next[k] += qty;
+    reconcile(prev, next);
+    toast((kind === "receive" ? "Delivery checked in: " : "Stock added: ") + "+" + fmtNum(qty) + " " + ING[k].unit + " " + ING[k].name.toLowerCase() + ".");
+    scheduleCompact();
+  }
+
+  function placeOrder(k) {
+    if (!canWrite() || hasOpenOrder(k)) return;
+    write("set", "open/" + k, { ing: k, amount: ING[k].reorder, ts: Date.now(), by: actorId() });
+    toast("Supplier order placed for " + ING[k].name.toLowerCase() + ".");
+  }
+
+  function ackAlert(k) {
+    var it = view.alertItems.filter(function (x) { return x.k === k; })[0];
+    if (!it || !canWrite()) return;
+    var cur = data.alerts[k] || { ing: k, level: it.status, stock: it.level, ts: Date.now(), since: Date.now(), by: actorId() };
+    write("set", "alerts/" + k, Object.assign({}, cur, { ack: { level: it.status, by: actorId(), ts: Date.now() } }));
+  }
+
+  /* =====================================================================
+     Housekeeping: fold old ledger entries into the baseline
+     ===================================================================== */
+  var compacting = false, lastCompact = 0, compactTimer = null;
+  function scheduleCompact() {
+    clearTimeout(compactTimer);
+    compactTimer = setTimeout(maybeCompact, 4000);
+  }
+  async function maybeCompact() {
+    if (compacting || !isReady() || outbox.length || navigator.onLine === false) return;
+    var now = Date.now();
+    if (now - lastCompact < 10 * 60 * 1000) return;
+    var base = view.base;
+    var rows = Object.keys(data.ledger).map(function (id) { return { id: id, e: data.ledger[id] }; })
+      .filter(function (r) { return r.e && typeof r.e.ts === "number"; });
+    var stale = rows.filter(function (r) { return r.e.ts <= base.throughTs; });
+    var fresh = rows.filter(function (r) { return r.e.ts > base.throughTs; }).sort(function (a, b) { return a.e.ts - b.e.ts; });
+    var n = fresh.filter(function (r) { return r.e.ts < now - RETAIN_MS; }).length;
+    if (fresh.length - n > COMPACT_OVER) n = fresh.length - COMPACT_TO;
+    n = Math.min(n, COMPACT_BATCH);
+    while (n > 0 && fresh[n - 1].e.ts > now - COMPACT_GUARD_MS) n--;
+    while (n > 0 && n < fresh.length && fresh[n].e.ts === fresh[n - 1].e.ts) n++;
+    if (!n && !stale.length) return;
+    compacting = true; lastCompact = now;
+    try {
+      if (sync.mode === "live") {
+        var lease = await sync.db.doc("meta/lock").acquire({ holder: deviceId, ttlMs: 60000 });
+        if (!lease || !lease.acquired) return;
+        var snap = await sync.db.doc("meta/baseline").get();
+        var cur = snap.exists ? snap.data() : null;
+        if ((cur ? cur.throughTs : 0) !== base.throughTs) return;   // someone else already folded
+      }
+      var folded = fresh.slice(0, n);
+      if (folded.length) {
+        var levels = Object.assign(defaultLevels(), base.levels || {});
+        var lastNum = base.lastNum || 0;
+        folded.forEach(function (r) {
+          var d = r.e.deltas || {};
+          for (var k in d) if (k in levels) levels[k] += Number(d[k]) || 0;
+          if (r.e.kind === "sale" && r.e.num > lastNum) lastNum = r.e.num;
+        });
+        write("set", "meta/baseline", { levels: levels, throughTs: folded[folded.length - 1].e.ts, lastNum: lastNum, ts: now });
+      }
+      stale.concat(folded).slice(0, COMPACT_BATCH * 2).forEach(function (r) { write("delete", "ledger/" + r.id); });
+    } catch (e) { /* try again on a later action */ }
+    finally { compacting = false; }
+  }
+
+  /* =====================================================================
+     Rendering plumbing
+     ===================================================================== */
+  var renderTimer = null, stageTimer = null, renderCache = {};
+  var ui = { tab: "order", cat: "All", pay: "Cash", cart: {}, logWho: "all", logIng: "all", logType: "all", logLimit: 40, range: "today" };
+  var countDraft = null;   // in-progress closing count: { expected: {ing: n}, counted: {ing: "text"} }
+
+  function scheduleRender() {
+    if (renderTimer) return;
+    renderTimer = setTimeout(function () { renderTimer = null; renderAll(); }, 30);
+  }
+  function sigRender(key, sig, build) {
+    if (renderCache[key] === sig) return;
+    renderCache[key] = sig;
+    build();
+  }
+  function renderAll() {
+    if (!data) data = buildData();
+    view = derive();
+    renderChrome();
+    renderTab(ui.tab);
+    checkNotify();
+    scheduleStageTimer();
+  }
+  function renderTab(tab) {
+    if (tab === "order") { renderMenu(); renderTicket(); renderRecent(); }
+    else if (tab === "queue") renderQueue();
+    else if (tab === "storage") renderStorage();
+    else if (tab === "count") renderCount();
+    else if (tab === "insights") renderInsights();
+    else if (tab === "owner") renderOwner();
+  }
+  function scheduleStageTimer() {
+    clearTimeout(stageTimer);
+    var soon = Infinity, now = Date.now();
+    view.openOrders.forEach(function (o) {
+      var t = o.stage === "ordering" ? o.ts + STAGE_ORDER_MS : o.stage === "transit" ? o.ts + STAGE_TRANSIT_MS : Infinity;
+      if (t < soon) soon = t;
+    });
+    if (soon !== Infinity) stageTimer = setTimeout(scheduleRender, Math.max(80, soon - now + 40));
+  }
+  setInterval(function () { if (view) { renderCache = {}; scheduleRender(); } }, 60000);   // refresh "5 min ago" text
+
+  /* ---------- header, badges, strip ---------- */
+  function pillState() {
+    if (sync.mode === "connecting") return ["syncing", "Connecting…"];
+    if (sync.mode === "local") return ["local", "Saved on this device"];
+    if (sync.err) return ["offline", "Sync problem"];
+    if (!isReady()) return ["syncing", "Loading shared data…"];
+    var n = outbox.length;
+    if (navigator.onLine === false) return ["offline", n ? "Offline · " + n + " waiting" : "Offline"];
+    if (n) return ["syncing", "Syncing " + n + "…"];
+    return ["", "Live"];
+  }
+
+  function renderChrome() {
+    var p = pillState();
+    $("syncPill").className = "sync-pill" + (p[0] ? " " + p[0] : "");
+    $("syncLabel").textContent = p[1];
+
+    $("staffName").textContent = session.staff ? session.staff.name : "Signed out";
+    $("staffAvatar").textContent = session.staff ? session.staff.name.charAt(0).toUpperCase() : "–";
+
+    var owner = isOwnerView();
+    $("ownerTabBtn").hidden = !owner;
+    if (!owner && ui.tab === "owner") setTab("order");
+
+    var lowCount = view.alertItems.length;
+    var unacked = view.alertItems.filter(function (i) { return i.unacked; });
+    var pq = view.sales.filter(function (s) { return s.prep !== "done"; }).length;
+    setBadge("queueBadge", pq);
+    setBadge("storageBadge", lowCount);
+    setBadge("countBadge", view.todayCount ? 0 : 1);
+    setBadge("ownerBadge", owner ? unacked.length + view.unackedCounts.length : 0);
+
+    var strip = $("alertStrip");
+    if (owner && unacked.length && ui.tab !== "owner" && isReady()) {
+      var names = unacked.slice(0, 3).map(function (i) { return ING[i.k].name + (i.status === "critical" ? " (critical)" : ""); }).join(", ");
+      var more = unacked.length > 3 ? " and " + (unacked.length - 3) + " more" : "";
+      sigRender("strip", names + more + unacked.length, function () {
+        strip.innerHTML = '<span><strong>' + unacked.length + (unacked.length === 1 ? " item is" : " items are") + " running low.</strong>" + esc(names + more) + '</span><button type="button" id="stripBtn">Review</button>';
+      });
+      strip.hidden = false;
+    } else { strip.hidden = true; renderCache.strip = null; }
+
+    document.title = (owner && unacked.length ? "(" + unacked.length + ") " : "") + "Lurk — POS";
+    $("footNote").innerHTML = sync.mode === "live"
+      ? "Stock, orders, alerts and staff activity sync live between everyone signed in to your organization. Supplier ordering and deliveries are simulated; nothing is sent to a real supplier."
+      : "Demo mode — everything here (orders, stock, staff PINs, the owner view) is saved in your browser only, so feel free to click around: ring up a coffee, run an ingredient low, check the Owner tab. Supplier ordering and deliveries are simulated; nothing is sent to a real backend.";
+  }
+  function setBadge(id, n) { var b = $(id); b.textContent = n; b.hidden = !(n > 0); }
+
+  $("alertStrip").addEventListener("click", function (e) { if (e.target.closest("#stripBtn")) setTab("owner"); });
+
+  function setTab(tab) {
+    ui.tab = tab;
+    document.querySelectorAll("#tabs button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
+    ["order", "queue", "storage", "count", "insights", "owner"].forEach(function (t) { $(t + "View").hidden = t !== tab; });
+    renderCache = {};
+    if (view) { renderChrome(); renderTab(tab); }
+  }
+  $("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-tab]");
+    if (btn) setTab(btn.getAttribute("data-tab"));
+  });
+
+  /* ---------- Order tab ---------- */
+  var menuNodes = {};
+  function buildCats() {
+    var row = $("catRow"); row.innerHTML = "";
+    CATS.forEach(function (c) {
+      var b = el("button", c === ui.cat ? "active" : "", esc(c));
+      b.type = "button";
+      b.addEventListener("click", function () {
+        ui.cat = c;
+        row.querySelectorAll("button").forEach(function (x) { x.classList.toggle("active", x === b); });
+        renderMenu();
+      });
+      row.appendChild(b);
+    });
+  }
+  function buildMenu() {
+    var grid = $("menuGrid"); grid.innerHTML = "";
+    MENU.forEach(function (item) {
+      var b = el("button", "item-card",
+        '<span class="item-cat-tag">' + esc(item.cat) + '</span><span class="item-name serif">' + esc(item.name) + '</span>' +
+        '<div class="item-foot"><span class="item-price">' + peso(item.price) + '</span><span class="item-avail"></span></div>');
+      b.type = "button";
+      b.addEventListener("click", function () { addToCart(item); });
+      menuNodes[item.id] = { b: b, avail: b.querySelector(".item-avail") };
+      grid.appendChild(b);
+    });
+  }
+  function renderMenu() {
+    MENU.forEach(function (item) {
+      var n = menuNodes[item.id], avail = makableCount(item);
+      n.b.hidden = !(ui.cat === "All" || item.cat === ui.cat);
+      n.b.disabled = avail <= 0;
+      n.avail.textContent = avail <= 0 ? "out of stock" : "≈" + avail + " left";
+      n.avail.classList.toggle("low", avail <= 4);
+    });
+  }
+  function addToCart(item) {
+    if (makableCount(item) <= (ui.cart[item.id] || 0)) { toast("No more " + item.name.toLowerCase() + " can be made from current stock."); return; }
+    ui.cart[item.id] = (ui.cart[item.id] || 0) + 1;
+    renderTicket();
+  }
+  function cartLines() {
+    return Object.keys(ui.cart).filter(function (id) { return ui.cart[id] > 0; })
+      .map(function (id) { return { item: MENU.filter(function (m) { return m.id === id; })[0], qty: ui.cart[id] }; });
+  }
+  function cartTotals() {
+    var subtotal = cartLines().reduce(function (s, l) { return s + l.item.price * l.qty; }, 0);
+    var tax = Math.round(subtotal * 0.12);
+    return { subtotal: subtotal, tax: tax, total: subtotal + tax };
+  }
+
+  function renderTicket() {
+    $("ticketNum").textContent = "#" + pad3(view.nextNum);
+    $("ticketSub").textContent = session.staff ? "Ringing as " + session.staff.name + " · tap an item to add it" : "tap an item to add it";
+    var lines = cartLines(), container = $("ticketLines");
+    container.innerHTML = "";
+    if (!lines.length) container.appendChild(el("div", "ticket-empty", "No items yet"));
+    lines.forEach(function (l) {
+      var row = el("div", "line-item",
+        '<span class="li-name">' + esc(l.item.name) + '</span><span class="li-price">' + peso(l.item.price * l.qty) + '</span>' +
+        '<div class="qty-stepper"><button type="button" data-act="dec" aria-label="Remove one ' + esc(l.item.name) + '">−</button><span>' + l.qty + '</span><button type="button" data-act="inc" aria-label="Add one ' + esc(l.item.name) + '">+</button></div>');
+      row.querySelector('[data-act="dec"]').addEventListener("click", function () {
+        ui.cart[l.item.id] = Math.max(0, ui.cart[l.item.id] - 1); renderTicket();
+      });
+      row.querySelector('[data-act="inc"]').addEventListener("click", function () {
+        if (makableCount(l.item) > l.qty) { ui.cart[l.item.id]++; renderTicket(); }
+      });
+      container.appendChild(row);
+    });
+    var t = cartTotals();
+    $("ticketTotals").innerHTML =
+      '<div class="row"><span>Subtotal</span><span>' + peso(t.subtotal) + '</span></div>' +
+      '<div class="row"><span>Tax (12%)</span><span>' + peso(t.tax) + '</span></div>' +
+      '<div class="row total"><span>Total</span><span>' + peso(t.total) + '</span></div>';
+    $("payBlock").hidden = !lines.length;
+    renderChange(t.total);
+    updateSendBtn(lines.length, t.total);
+  }
+  function renderChange(total) {
+    $("cashArea").hidden = ui.pay !== "Cash";
+    var line = $("changeLine");
+    if (ui.pay !== "Cash") { line.innerHTML = ""; return; }
+    var received = parseFloat($("cashInput").value || "0");
+    if (!received) { line.className = "change-line"; line.innerHTML = "<span>Change due</span><span>—</span>"; return; }
+    if (received < total) { line.className = "change-line warn"; line.innerHTML = "<span>Short by</span><span>" + peso(total - received) + "</span>"; }
+    else { line.className = "change-line ok"; line.innerHTML = "<span>Change due</span><span>" + peso(received - total) + "</span>"; }
+  }
+  function updateSendBtn(lineCount, total) {
+    var btn = $("sendBtn");
+    if (!session.staff) { btn.disabled = true; btn.textContent = "Sign in to take orders"; return; }
+    if (!isReady()) { btn.disabled = true; btn.textContent = sync.mode === "live" ? "Loading shared stock…" : "Connecting…"; return; }
+    if (!lineCount) { btn.disabled = true; btn.textContent = "Add items to start an order"; return; }
+    if (ui.pay === "Cash" && !(parseFloat($("cashInput").value || "0") >= total)) { btn.disabled = true; btn.textContent = "Waiting for cash amount"; return; }
+    btn.disabled = false; btn.textContent = "Take payment & start order";
+  }
+  $("payMethods").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-method]");
+    if (!btn) return;
+    ui.pay = btn.getAttribute("data-method");
+    document.querySelectorAll("#payMethods button").forEach(function (b) { b.classList.toggle("active", b === btn); });
+    var t = cartTotals(); renderChange(t.total); updateSendBtn(cartLines().length, t.total);
+  });
+  $("cashInput").addEventListener("input", function () {
+    var t = cartTotals(); renderChange(t.total); updateSendBtn(cartLines().length, t.total);
+  });
+
+  $("sendBtn").addEventListener("click", function () {
+    if (!canWrite()) return;
+    var lines = cartLines();
+    if (!lines.length) return;
+    var t = cartTotals(), err = $("ticketError");
+    err.textContent = "";
+    var received = parseFloat($("cashInput").value || "0");
+    if (ui.pay === "Cash" && received < t.total) { err.textContent = "Cash received is less than the total."; return; }
+
+    var deltas = {};
+    lines.forEach(function (l) {
+      for (var k in l.item.recipe) deltas[k] = (deltas[k] || 0) - l.item.recipe[k] * l.qty;
+    });
+    for (var dk in deltas) {
+      if (view.shown[dk] + deltas[dk] < 0) {
+        err.textContent = "Not enough " + ING[dk].name.toLowerCase() + " left. Another device may have just used it.";
+        renderMenu(); return;
+      }
+    }
+    var prev = clone(view.shown), next = clone(prev);
+    for (var nk in deltas) next[nk] = Math.max(0, next[nk] + deltas[nk]);
+
+    var entry = {
+      ts: Date.now(), kind: "sale", by: actorId(), num: view.nextNum,
+      items: lines.map(function (l) { return { id: l.item.id, name: l.item.name, qty: l.qty }; }),
+      total: t.total, payMethod: ui.pay, change: ui.pay === "Cash" ? Math.max(0, received - t.total) : 0,
+      prep: "preparing", deltas: deltas
+    };
+    write("set", "ledger/" + newId(), entry);
+    reconcile(prev, next);
+
+    ui.cart = {}; ui.pay = "Cash";
+    $("cashInput").value = "";
+    document.querySelectorAll("#payMethods button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-method") === "Cash"); });
+    scheduleCompact();
+    renderAll();
+  });
+
+  function renderRecent() {
+    var rows = $("logRows"), recent = view.sales.slice(0, 5);
+    var sig = JSON.stringify([recent.map(function (s) { return [s.id, !!view.pendingIds[s.id]]; }), namesSig(), navigator.onLine]);
+    sigRender("recent", sig, function () {
+      rows.innerHTML = "";
+      if (!recent.length) { rows.appendChild(el("div", "log-row", "<span>No orders yet</span><span></span>")); return; }
+      recent.forEach(function (o) {
+        var st = view.pendingIds[o.id] ? (navigator.onLine === false || sync.mode !== "live" ? "queued" : "syncing") : "synced";
+        if (sync.mode === "local") st = "synced";
+        rows.appendChild(el("div", "log-row",
+          "<span>#" + pad3(o.num) + " · " + esc(fmtTime(o.ts)) + " · " + esc(staffName(o.by)) + '</span><span class="log-status ' + st + '">' + st + "</span>"));
+      });
+    });
+  }
+
+  /* ---------- Prep queue ---------- */
+  function renderQueue() {
+    var pending = view.sales.filter(function (s) { return s.prep !== "done"; }).slice().reverse();
+    var sig = JSON.stringify([pending.map(function (s) { return s.id; }), namesSig(), canWrite()]);
+    sigRender("queue", sig, function () {
+      var grid = $("queueGrid");
+      if (!pending.length) {
+        grid.className = "";
+        grid.innerHTML = '<div class="queue-empty">Nothing to make right now. New orders appear here the moment they are paid.</div>';
+        return;
+      }
+      grid.className = "queue-grid"; grid.innerHTML = "";
+      pending.forEach(function (o) {
+        var card = el("div", "queue-card",
+          '<div class="queue-top"><span class="queue-num serif">#' + pad3(o.num) + '</span><span class="queue-time">' + esc(fmtTime(o.ts)) + " · " + esc(staffName(o.by)) + "</span></div>" +
+          '<ul class="queue-items">' + (o.items || []).map(function (i) { return "<li><span>" + esc(i.name) + "</span><span>×" + i.qty + "</span></li>"; }).join("") + "</ul>" +
+          '<div class="queue-foot"><span class="pay-chip">' + esc(o.payMethod) + (o.payMethod === "Cash" && o.change > 0 ? " · " + peso(o.change) + " change" : "") + "</span><span>" + peso(o.total) + "</span></div>" +
+          '<button type="button" class="done-btn"' + (canWrite() ? "" : " disabled") + '>Mark made &amp; handed over</button>');
+        card.querySelector(".done-btn").addEventListener("click", function () {
+          if (!canWrite()) return;
+          write("update", "ledger/" + o.id, { prep: "done", doneBy: actorId(), doneTs: Date.now() });
+        });
+        grid.appendChild(card);
+      });
+    });
+  }
+
+  /* ---------- Storage tab ---------- */
+  function supplierText(o) {
+    if (o.stage === "ordering") return "Placing order with supplier";
+    if (o.stage === "transit") return "On its way";
+    return "Arrived, waiting to be checked in";
+  }
+  function renderStorage() {
+    var receives = view.entries.filter(function (e) { return e.kind === "receive"; }).slice(0, 3);
+    var cw = canWrite();
+
+    sigRender("sup", JSON.stringify([view.openOrders.map(function (o) { return [o.k, o.ts, o.stage, o.by]; }), receives.map(function (r) { return r.id; }), cw, namesSig()]), function () {
+      var panel = $("supplierPanel");
+      if (!view.openOrders.length && !receives.length) { panel.innerHTML = ""; return; }
+      var rows = "";
+      view.openOrders.forEach(function (o) {
+        var ing = ING[o.k];
+        var action = o.stage === "arrived"
+          ? '<button type="button" class="receive-btn" data-receive="' + esc(o.k) + '"' + (cw ? "" : " disabled") + ">Check in delivery</button>"
+          : '<span class="auto-status ' + o.stage + '">' + (o.stage === "ordering" ? "Ordering" : "In transit") + "</span>";
+        rows += '<div class="auto-row"><span>' + esc(ing.name) + " · +" + fmtNum(o.amount) + " " + ing.unit +
+          "<small>" + esc(supplierText(o)) + " · ordered by " + esc(staffName(o.by)) + ", " + esc(fmtTime(o.ts)) + "</small></span>" + action + "</div>";
+      });
+      receives.forEach(function (r) {
+        var ing = ING[r.ing]; if (!ing) return;
+        var off = typeof r.ordered === "number" && r.ordered !== r.qty;
+        rows += '<div class="auto-row"><span>' + esc(ing.name) + " · +" + fmtNum(r.qty) + " " + ing.unit +
+          "<small>Checked in by " + esc(staffName(r.by)) + ", " + esc(fmtTime(r.ts)) + (off ? " · ordered " + fmtNum(r.ordered) : "") + '</small></span><span class="auto-status received">Received</span></div>';
+      });
+      panel.innerHTML = '<div class="auto-panel"><div class="auto-panel-head"><span class="dot"></span><h3>Supplier orders</h3></div>' + rows + "</div>";
+    });
+
+    var low = view.alertItems;
+    sigRender("banner", JSON.stringify(low.map(function (i) { return [i.k, i.status]; })), function () {
+      $("lowBanner").innerHTML = low.length
+        ? '<div class="low-banner"><span>⚠</span><div><strong>' + low.length + " item" + (low.length > 1 ? "s" : "") + " need attention</strong>" + esc(low.map(function (i) { return ING[i.k].name; }).join(", ")) + "</div></div>"
+        : "";
+    });
+
+    sigRender("grid", JSON.stringify([view.shown, view.openOrders.map(function (o) { return o.k; }), cw]), function () {
+      var grid = $("stockGrid"); grid.innerHTML = "";
+      Object.keys(ING).forEach(function (k) {
+        var ing = ING[k], st = view.status[k];
+        var pct = Math.max(2, Math.min(100, Math.round(view.shown[k] / ing.capacity * 100)));
+        var needsOrder = st !== "ok" && !view.openOrders.some(function (o) { return o.k === k; });
+        var card = el("div", "stock-card",
+          '<div class="stock-top"><span class="stock-name serif">' + esc(ing.name) + '</span><span class="stock-tag ' + st + '">' + (st === "critical" && view.shown[k] === 0 ? "out" : st) + "</span></div>" +
+          '<div class="stock-num">' + fmtNum(view.shown[k]) + " / " + fmtNum(ing.capacity) + " " + ing.unit + "</div>" +
+          '<div class="bar-track"><div class="bar-fill ' + (st !== "ok" ? st : "") + '" style="width:' + pct + '%"></div></div>' +
+          '<div class="card-actions"><button type="button" class="restock-btn" data-add="' + k + '"' + (cw ? "" : " disabled") + ">Add stock</button>" +
+          (needsOrder ? '<button type="button" class="restock-btn" data-order="' + k + '"' + (cw ? "" : " disabled") + ">Order from supplier</button>" : "") + "</div>");
+        grid.appendChild(card);
+      });
+    });
+
+    renderActivity();
+  }
+  $("supplierPanel").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-receive]");
+    if (!b) return;
+    var k = b.getAttribute("data-receive");
+    var o = view.openOrders.filter(function (x) { return x.k === k; })[0];
+    if (o) openStockModal("receive", k, o);
+  });
+  $("stockGrid").addEventListener("click", function (e) {
+    var a = e.target.closest("button[data-add]");
+    if (a) { openStockModal("restock", a.getAttribute("data-add")); return; }
+    var o = e.target.closest("button[data-order]");
+    if (o) placeOrder(o.getAttribute("data-order"));
+  });
+
+  /* ---------- Activity log ---------- */
+  function fillFilters() {
+    var whoSig = namesSig();
+    sigRender("fwho", whoSig, function () {
+      var sel = $("fWho"), keep = ui.logWho;
+      var html = '<option value="all">Everyone</option><option value="owner">Owner</option>';
+      staffList().forEach(function (s) { html += '<option value="' + esc(s.id) + '">' + esc(s.name) + (s.active === false ? " (inactive)" : "") + "</option>"; });
+      sel.innerHTML = html; sel.value = keep;
+      if (sel.value !== keep) { sel.value = "all"; ui.logWho = "all"; }
+    });
+    if (!$("fIng").options.length) {
+      var h = '<option value="all">All ingredients</option>';
+      Object.keys(ING).forEach(function (k) { h += '<option value="' + k + '">' + esc(ING[k].name) + "</option>"; });
+      $("fIng").innerHTML = h;
+    }
+  }
+  function describeEntry(e) {
+    if (e.kind === "sale") {
+      var items = (e.items || []).map(function (i) { return esc(i.name) + " ×" + i.qty; }).join(", ");
+      var used = "";
+      if (ui.logIng !== "all" && e.deltas && e.deltas[ui.logIng]) used = " · used " + fmtNum(-e.deltas[ui.logIng]) + " " + ING[ui.logIng].unit;
+      return '<span class="kind sale">Sale</span>#' + pad3(e.num) + " " + items + used;
+    }
+    var ing = ING[e.ing]; if (!ing) return "Stock change";
+    var note = e.note ? " · " + esc(e.note) : "";
+    if (e.kind === "restock") return '<span class="kind restock">Added</span>+' + fmtNum(e.qty) + " " + ing.unit + " " + esc(ing.name.toLowerCase()) + note;
+    var flag = "";
+    if (typeof e.ordered === "number" && e.ordered !== e.qty) flag = ' <span class="flag">· ordered ' + fmtNum(e.ordered) + ", " + (e.qty < e.ordered ? "short " : "over ") + fmtNum(Math.abs(e.ordered - e.qty)) + "</span>";
+    return '<span class="kind receive">Received</span>+' + fmtNum(e.qty) + " " + ing.unit + " " + esc(ing.name.toLowerCase()) + flag + note;
+  }
+  function renderActivity() {
+    fillFilters();
+    var rows = view.entries.filter(function (e) {
+      if (ui.logWho !== "all" && e.by !== ui.logWho) return false;
+      if (ui.logType !== "all" && e.kind !== ui.logType) return false;
+      if (ui.logIng !== "all") {
+        if (e.kind === "sale") { if (!e.deltas || !e.deltas[ui.logIng]) return false; }
+        else if (e.ing !== ui.logIng) return false;
+      }
+      return true;
+    });
+    var shown = rows.slice(0, ui.logLimit);
+    var sig = JSON.stringify([rows.length, rows[0] && rows[0].id, ui.logWho, ui.logIng, ui.logType, ui.logLimit, Math.floor(Date.now() / 60000), namesSig()]);
+    sigRender("activity", sig, function () {
+      var list = $("activityList");
+      if (!shown.length) { list.innerHTML = '<div class="activity-empty">No activity matches these filters yet.</div>'; }
+      else {
+        list.innerHTML = shown.map(function (e) {
+          return '<div class="activity-row"><span class="activity-actor">' + esc(staffName(e.by)) + '</span><span class="activity-text">' + describeEntry(e) +
+            '</span><span class="activity-time">' + esc(fmtTime(e.ts)) + "</span></div>";
+        }).join("");
+      }
+      $("moreBtn").hidden = rows.length <= ui.logLimit;
+    });
+  }
+  ["fWho", "fIng", "fType"].forEach(function (id) {
+    $(id).addEventListener("change", function () {
+      ui.logWho = $("fWho").value; ui.logIng = $("fIng").value; ui.logType = $("fType").value; ui.logLimit = 40;
+      renderActivity();
+    });
+  });
+  $("moreBtn").addEventListener("click", function () { ui.logLimit += 40; renderActivity(); });
+
+  /* ---------- Closing count ---------- */
+  function startCountDraft() {
+    var counted = {};
+    for (var k in ING) counted[k] = "";
+    countDraft = { counted: counted };
+  }
+  function countRowHtml(k) {
+    var ing = ING[k];
+    return '<div class="count-row"><span class="count-name">' + esc(ing.name) + '</span>' +
+      '<span class="count-expected" id="cexp_' + k + '"></span>' +
+      '<input type="number" class="count-input" data-k="' + k + '" inputmode="numeric" min="0" aria-label="Counted ' + esc(ing.name) + '">' +
+      '<button type="button" class="restock-btn count-match" data-match="' + k + '">Matches</button>' +
+      '<span class="count-diff" id="cdiff_' + k + '"></span></div>';
+  }
+  function updateExpected(k) {
+    var span = $("cexp_" + k);
+    if (span) span.textContent = "expected " + fmtNum(view.shown[k]) + " " + ING[k].unit;
+  }
+  function updateDiff(k) {
+    var span = $("cdiff_" + k), val = countDraft.counted[k];
+    if (!span) return;
+    if (val === "" || val === null || isNaN(Number(val))) { span.textContent = ""; span.className = "count-diff"; return; }
+    var diff = Math.round(Number(val)) - view.shown[k];
+    if (diff === 0) { span.textContent = "matches"; span.className = "count-diff ok"; return; }
+    var flag = Math.abs(diff) >= countThreshold(k);
+    span.textContent = (diff > 0 ? "+" : "") + fmtNum(diff) + " " + ING[k].unit;
+    span.className = "count-diff" + (flag ? " flag" : "");
+  }
+  function updateSubmitEnabled() {
+    var sb = $("submitCountBtn");
+    if (!sb) return;
+    var filled = Object.keys(ING).every(function (k) { return countDraft.counted[k] !== "" && !isNaN(Number(countDraft.counted[k])); });
+    sb.disabled = !(filled && canWrite());
+  }
+  function renderCount() {
+    if (!countDraft) {
+      var tc = view.todayCount;
+      if (!tc) { startCountDraft(); renderCount(); return; }
+      sigRender("count", JSON.stringify(["done", tc.id, tc.ack, namesSig()]), function () {
+        var fl = tc.flagged || [];
+        var chips = fl.length
+          ? fl.map(function (k) { var d = tc.rows[k].diff; return '<span class="count-flagged-chip">' + esc(ING[k].name) + " " + (d > 0 ? "+" : "") + fmtNum(d) + " " + ING[k].unit + "</span>"; }).join("")
+          : '<span class="count-ok-chip">Everything matched</span>';
+        $("countBox").innerHTML = '<div class="count-done"><strong>Closing count done for today</strong>By ' + esc(staffName(tc.by)) + " · " + esc(fmtTime(tc.ts)) +
+          '<div style="margin-top:8px;">' + chips + '</div>' +
+          '<button type="button" class="restock-btn" id="recountBtn" style="margin-top:14px;max-width:180px;">Recount</button></div>';
+        $("recountBtn").addEventListener("click", function () { startCountDraft(); renderCache.count = null; renderCount(); });
+      });
+      return;
+    }
+    sigRender("count", JSON.stringify(["draft", namesSig()]), function () {
+      var box = $("countBox");
+      box.innerHTML = '<div class="count-list">' + Object.keys(ING).map(countRowHtml).join("") + '</div>' +
+        '<button type="button" class="send-btn" id="submitCountBtn" disabled>Submit closing count</button>';
+      box.querySelectorAll(".count-input").forEach(function (inp) {
+        inp.addEventListener("input", function () {
+          countDraft.counted[inp.getAttribute("data-k")] = inp.value;
+          updateDiff(inp.getAttribute("data-k"));
+          updateSubmitEnabled();
+        });
+      });
+      box.querySelectorAll("[data-match]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var k = btn.getAttribute("data-match");
+          countDraft.counted[k] = String(view.shown[k]);
+          var inp = box.querySelector('.count-input[data-k="' + k + '"]');
+          if (inp) inp.value = countDraft.counted[k];
+          updateDiff(k); updateSubmitEnabled();
+        });
+      });
+      $("submitCountBtn").addEventListener("click", submitCount);
+    });
+    Object.keys(ING).forEach(function (k) { updateExpected(k); updateDiff(k); });
+    updateSubmitEnabled();
+  }
+  function submitCount() {
+    if (!canWrite() || !countDraft) return;
+    var rows = {}, flagged = [];
+    for (var k in ING) {
+      var n = Math.round(Number(countDraft.counted[k]));
+      var expected = view.shown[k];
+      var diff = n - expected;
+      rows[k] = { expected: expected, counted: n, diff: diff };
+      if (Math.abs(diff) >= countThreshold(k)) flagged.push(k);
+    }
+    var now = Date.now();
+    write("set", "counts/" + newId(), { ts: now, by: actorId(), date: dateKey(now), rows: rows, flagged: flagged, ack: null });
+    countDraft = null;
+    toast(flagged.length ? "Closing count submitted — " + flagged.length + " item" + (flagged.length > 1 ? "s" : "") + " flagged for the owner." : "Closing count submitted — everything matched.");
+    renderCache.count = null;
+    scheduleRender();
+  }
+
+  /* ---------- Insights ---------- */
+  $("rangeRow").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-range]");
+    if (!b) return;
+    ui.range = b.getAttribute("data-range");
+    document.querySelectorAll("#rangeRow button").forEach(function (x) { x.classList.toggle("active", x === b); });
+    renderCache.insights = null; renderInsights();
+  });
+  function renderInsights() {
+    var startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+    var start = ui.range === "today" ? startOfDay.getTime() : Date.now() - 3 * 86400000;
+    var inRange = view.entries.filter(function (e) { return e.ts >= start; });
+    var sales = inRange.filter(function (e) { return e.kind === "sale"; });
+    var sig = JSON.stringify([ui.range, inRange.length, inRange[0] && inRange[0].id, namesSig()]);
+    sigRender("insights", sig, function () {
+      var summary = $("insightSummary"), sellersEl = $("topSellers"), payEl = $("payBreakdown");
+      if (!sales.length) {
+        summary.innerHTML = '<div class="insight-card"><div class="label">No sales yet</div><div class="value serif" style="font-size:16px;">' + (ui.range === "today" ? "Nothing sold today" : "Nothing sold in 3 days") + "</div></div>";
+        sellersEl.innerHTML = '<div class="insight-empty">No sales in this period.</div>';
+        payEl.innerHTML = "";
+      } else {
+        var revenue = sales.reduce(function (s, o) { return s + o.total; }, 0);
+        var counts = {};
+        sales.forEach(function (o) { (o.items || []).forEach(function (i) { counts[i.name] = (counts[i.name] || 0) + i.qty; }); });
+        var sellers = Object.keys(counts).map(function (n) { return { name: n, qty: counts[n] }; }).sort(function (a, b) { return b.qty - a.qty; });
+        var maxQty = sellers.length ? sellers[0].qty : 1;
+        var pays = {};
+        sales.forEach(function (o) { pays[o.payMethod] = (pays[o.payMethod] || 0) + 1; });
+        var maxPay = Math.max.apply(null, Object.keys(pays).map(function (k) { return pays[k]; }));
+        summary.innerHTML =
+          '<div class="insight-card"><div class="label">Revenue</div><div class="value serif">' + peso(revenue) + "</div></div>" +
+          '<div class="insight-card"><div class="label">Orders</div><div class="value serif">' + sales.length + "</div></div>" +
+          '<div class="insight-card"><div class="label">Average order</div><div class="value serif">' + peso(revenue / sales.length) + "</div></div>" +
+          '<div class="insight-card"><div class="label">Best seller</div><div class="value serif" style="font-size:18px;">' + esc(sellers[0] ? sellers[0].name : "—") + "</div></div>";
+        sellersEl.innerHTML = sellers.slice(0, 6).map(function (s) {
+          return '<div class="seller-row"><div class="seller-top"><span>' + esc(s.name) + "</span><span>" + s.qty + ' sold</span></div><div class="seller-bar-track"><div class="seller-bar-fill" style="width:' + Math.round(s.qty / maxQty * 100) + '%"></div></div></div>';
+        }).join("");
+        payEl.innerHTML = Object.keys(pays).map(function (m) {
+          return '<div class="pay-split-row"><div class="pay-split-top"><span>' + esc(m) + "</span><span>" + pays[m] + " order" + (pays[m] > 1 ? "s" : "") + '</span></div><div class="pay-split-track"><div class="pay-split-fill" style="width:' + Math.round(pays[m] / maxPay * 100) + '%"></div></div></div>';
+        }).join("");
+      }
+
+      var by = {};
+      function bucket(id) { return by[id] || (by[id] = { sale: 0, restock: 0, receive: 0 }); }
+      inRange.forEach(function (e) { if (bucket(e.by)[e.kind] !== undefined) bucket(e.by)[e.kind]++; });
+      var ids = Object.keys(by);
+      $("staffSummary").innerHTML = ids.length
+        ? '<div class="staff-table"><div class="st-head"><span>Staff</span><span class="num">Sales rung</span><span class="num">Stock added</span><span class="num">Deliveries in</span></div>' +
+          ids.map(function (id) {
+            return '<div class="st-line"><span>' + esc(staffName(id)) + '</span><span class="num">' + by[id].sale + '</span><span class="num">' + by[id].restock + '</span><span class="num">' + by[id].receive + "</span></div>";
+          }).join("") + "</div>"
+        : '<div class="insight-empty">No staff activity in this period.</div>';
+    });
+  }
+
+  /* ---------- Owner tab ---------- */
+  var notified = null;
+  function renderOwner() {
+    var items = view.alertItems, unacked = items.filter(function (i) { return i.unacked; });
+    $("ackAllBtn").hidden = !unacked.length;
+
+    sigRender("ownBoard", JSON.stringify([items.map(function (i) { return [i.k, i.status, i.level, i.since, i.ack, i.order && i.order.stage]; }), Math.floor(Date.now() / 60000), namesSig()]), function () {
+      var box = $("ownBoard");
+      if (!items.length) {
+        box.className = "";
+        box.innerHTML = '<div class="own-clear"><strong class="serif">All stocked up</strong>Nothing is running low right now.</div>';
+        return;
+      }
+      box.className = "own-board"; box.innerHTML = "";
+      items.forEach(function (it) {
+        var ing = ING[it.k];
+        var pct = Math.max(2, Math.min(100, Math.round(it.level / ing.capacity * 100)));
+        var sup = it.order ? supplierText(it.order) + " (" + fmtNum(it.order.amount) + " " + ing.unit + ")" : "No supplier order yet";
+        var since = it.since ? " · " + it.status + " since " + fmtTime(it.since) : "";
+        var right = it.unacked
+          ? '<button type="button" class="btn-quiet" data-ack="' + it.k + '">Acknowledge</button>'
+          : "Seen by " + esc(staffName(it.ack.by)) + ", " + esc(fmtTime(it.ack.ts));
+        box.appendChild(el("div", "own-item " + it.status,
+          '<div class="stock-top"><span class="stock-name serif">' + esc(ing.name) + '</span><span class="stock-tag ' + it.status + '">' + (it.level === 0 ? "out" : it.status) + "</span></div>" +
+          '<div class="stock-num">' + fmtNum(it.level) + " / " + fmtNum(ing.capacity) + " " + ing.unit + esc(since) + "</div>" +
+          '<div class="bar-track"><div class="bar-fill ' + it.status + '" style="width:' + pct + '%"></div></div>' +
+          '<div class="own-meta">' + esc(sup) + '</div><div class="own-actions">' + right + "</div>"));
+      });
+    });
+
+    var recentCounts = view.countDocs.slice(0, 6);
+    sigRender("ownCounts", JSON.stringify([recentCounts.map(function (c) { return [c.id, c.ack, (c.flagged || []).join(",")]; }), namesSig()]), function () {
+      $("ownCountsList").innerHTML = recentCounts.length ? recentCounts.map(function (c) {
+        var fl = c.flagged || [];
+        var chips = fl.length
+          ? fl.map(function (k) { var d = c.rows[k].diff; return '<span class="count-flagged-chip">' + esc(ING[k].name) + " " + (d > 0 ? "+" : "") + fmtNum(d) + " " + ING[k].unit + "</span>"; }).join("")
+          : '<span class="count-ok-chip">Everything matched</span>';
+        var right = fl.length ? (c.ack ? "Reviewed by " + esc(staffName(c.ack.by)) : '<button type="button" class="btn-quiet" data-ackcount="' + c.id + '">Acknowledge</button>') : "";
+        return '<div class="auto-row" style="align-items:flex-start;"><span>' + esc(fmtTime(c.ts)) + " · " + esc(staffName(c.by)) + '<div style="margin-top:4px;">' + chips + "</div></span>" + right + "</div>";
+      }).join("") : '<div class="insight-empty">No closing counts recorded yet.</div>';
+    });
+
+    var canNotify = "Notification" in window;
+    var perm = canNotify ? Notification.permission : "denied";
+    $("notifBtn").hidden = !(canNotify && perm === "default");
+    $("notifNote").textContent = !canNotify ? "" : perm === "granted" ? "Browser alerts are on while this page is open." : perm === "denied" ? "Browser alerts are blocked in this browser." : "";
+
+    var pending = outbox.length;
+    $("connInfo").innerHTML =
+      "<div><b>Mode:</b> " + (sync.mode === "live" ? "Live, shared with everyone signed in to your organization" : sync.mode === "local" ? "This device only (publish to share)" : "Connecting…") + "</div>" +
+      "<div><b>Status:</b> " + esc(pillState()[1]) + "</div>" +
+      "<div><b>Waiting to sync:</b> " + pending + " change" + (pending === 1 ? "" : "s") + "</div>" +
+      "<div><b>Signed in as:</b> " + esc(session.staff ? session.staff.name : "nobody") + "</div>";
+
+    if (!staffDirty) {
+      var ssig = JSON.stringify(staffList());
+      if (renderCache.staffEditor !== ssig) { renderCache.staffEditor = ssig; buildStaffEditor(); }
+    }
+    $("saveStaffBtn").disabled = !canWrite();
+  }
+  $("ownBoard").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-ack]");
+    if (b) ackAlert(b.getAttribute("data-ack"));
+  });
+  $("ownCountsList").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-ackcount]");
+    if (!b || !canWrite()) return;
+    write("update", "counts/" + b.getAttribute("data-ackcount"), { ack: { by: actorId(), ts: Date.now() } });
+  });
+  $("ackAllBtn").addEventListener("click", function () {
+    view.alertItems.filter(function (i) { return i.unacked; }).forEach(function (i) { ackAlert(i.k); });
+  });
+  $("notifBtn").addEventListener("click", function () {
+    try {
+      Notification.requestPermission().then(function () { renderCache = {}; scheduleRender(); });
+    } catch (e) { toast("This browser doesn't allow notifications here.", "warn"); }
+  });
+
+  // Fires once when something newly runs low (or gets worse) after the page has loaded. Owner only.
+  function checkNotify() {
+    if (!isReady()) return;
+    var cur = {};
+    view.alertItems.forEach(function (i) { if (i.unacked) cur[i.k] = i.status; });
+    if (notified === null) { notified = cur; return; }
+    var fresh = Object.keys(cur).filter(function (k) { return !(k in notified) || RANK[cur[k]] > RANK[notified[k]]; });
+    notified = cur;
+    if (!fresh.length || !isOwnerView() || !session.staff && sync.mode === "live" && !flags.owner) return;
+    var msg = fresh.map(function (k) {
+      return ING[k].name + " is " + (view.shown[k] === 0 ? "out" : cur[k]) + " (" + fmtNum(view.shown[k]) + " " + ING[k].unit + " left)";
+    }).join(". ") + ".";
+    toast(msg, "warn");
+    try {
+      if ("Notification" in window && Notification.permission === "granted") new Notification("Lurk: low stock", { body: msg });
+    } catch (e) { /* notifications unavailable */ }
+  }
+
+  /* ---------- Staff editor ---------- */
+  var staffDraft = [], staffDirty = false;
+  function buildStaffEditor() {
+    staffDraft = clone(staffList());
+    staffDirty = false;
+    drawStaffRows();
+  }
+  function drawStaffRows() {
+    var box = $("staffEditor"); box.innerHTML = "";
+    staffDraft.forEach(function (s, i) {
+      var row = el("div", "staff-row",
+        '<input type="text" class="st-name" maxlength="20" value="' + esc(s.name) + '" placeholder="Name" aria-label="Staff name">' +
+        '<input type="text" class="st-pin" inputmode="numeric" maxlength="4" value="' + esc(s.pin) + '" placeholder="PIN" aria-label="4-digit PIN">' +
+        '<label class="st-active"><input type="checkbox"' + (s.active !== false ? " checked" : "") + "> Active</label>");
+      row.querySelector(".st-name").addEventListener("input", function (e) { staffDraft[i].name = e.target.value; staffDirty = true; });
+      row.querySelector(".st-pin").addEventListener("input", function (e) { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4); staffDraft[i].pin = e.target.value; staffDirty = true; });
+      row.querySelector('input[type="checkbox"]').addEventListener("change", function (e) { staffDraft[i].active = e.target.checked; staffDirty = true; });
+      box.appendChild(row);
+    });
+  }
+  $("addStaffBtn").addEventListener("click", function () {
+    staffDraft.push({ id: "s_" + Math.random().toString(36).slice(2, 8), name: "", pin: "", active: true });
+    staffDirty = true;
+    drawStaffRows();
+    var names = document.querySelectorAll("#staffEditor .st-name");
+    if (names.length) names[names.length - 1].focus();
+  });
+  $("saveStaffBtn").addEventListener("click", function () {
+    var msg = $("staffMsg");
+    msg.textContent = "";
+    if (!canWrite()) { msg.textContent = "Sign in and wait for shared data to load first."; return; }
+    for (var i = 0; i < staffDraft.length; i++) {
+      var s = staffDraft[i];
+      if (s.active === false) continue;
+      if (!String(s.name).trim()) { msg.textContent = "Every active staff member needs a name."; return; }
+      if (!/^\d{4}$/.test(String(s.pin))) { msg.textContent = "PINs must be exactly 4 digits (" + s.name + ")."; return; }
+    }
+    var list = staffDraft.map(function (s) { return { id: s.id, name: String(s.name).trim(), pin: String(s.pin), active: s.active !== false }; });
+    write("set", "config/staff", { list: list, ts: Date.now() });
+    staffDirty = false; renderCache.staffEditor = null;
+    toast("Staff saved.");
+    scheduleRender();
+  });
+
+  /* ---------- Reset ---------- */
+  var resetArmed = null;
+  $("resetBtn").addEventListener("click", function () {
+    var btn = $("resetBtn");
+    if (!resetArmed) {
+      btn.textContent = "Tap again to confirm reset";
+      resetArmed = setTimeout(function () { resetArmed = null; btn.textContent = "Reset demo data"; }, 4000);
+      return;
+    }
+    clearTimeout(resetArmed); resetArmed = null; btn.textContent = "Reset demo data";
+    if (!canWrite()) { toast("Sign in and wait for shared data to load first.", "warn"); return; }
+    var maxTs = view.base.throughTs;
+    Object.keys(data.ledger).forEach(function (id) { var t = data.ledger[id] && data.ledger[id].ts; if (typeof t === "number" && t > maxTs) maxTs = t; });
+    write("set", "meta/baseline", { levels: defaultLevels(), throughTs: maxTs, lastNum: 0, ts: Date.now() });
+    Object.keys(data.open).forEach(function (k) { write("delete", "open/" + k); });
+    Object.keys(data.alerts).forEach(function (k) { write("delete", "alerts/" + k); });
+    Object.keys(data.counts).forEach(function (id) { write("delete", "counts/" + id); });
+    Object.keys(data.ledger).slice(0, 300).forEach(function (id) { write("delete", "ledger/" + id); });
+    ui.cart = {}; notified = null; countDraft = null; renderCache = {};
+    toast("Demo data reset.");
+    scheduleRender();
+  });
+
+  /* =====================================================================
+     Connectivity + boot
+     ===================================================================== */
+  window.addEventListener("online", function () { flush(); scheduleRender(); });
+  window.addEventListener("offline", function () { scheduleRender(); });
+
+  buildCats();
+  buildMenu();
+  data = buildData();
+  view = derive();
+  showLogin();
+  renderAll();
+  initCloud();
+})();
+</script>
+</body>
+</html>
