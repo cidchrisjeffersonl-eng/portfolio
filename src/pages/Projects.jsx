@@ -4,11 +4,21 @@ export default function Projects() {
       emoji: "📊",
       title: "Smart Feedback Analytics",
       description:
-        "Interactive preview of the analytics dashboard from the Smart Feedback Analytics capstone — AI-generated insights, sentiment breakdown, thematic clustering, and phrase-level sentiment annotation on flagged faculty comments. Built with synthetic data to showcase the UI/analytics layer of the full-stack system",
+        "Preview of the Smart Feedback Analytics capstone dashboard, showing synthetic faculty-feedback data with sentiment breakdowns, AI-generated insights, risk flags, and theme clustering. The demo highlights the analytics interface and contains no real student or faculty data.",
       tags: ["JavaScript", "Data Visualization", "NLP UI"],
       github: "https://github.com/cidchrisjeffersonl-eng/smart-feedback-analytics",
       demo: "/edupulse-ai-demo.html",
       featured: true,
+    },
+    {
+      emoji: "👗",
+      title: "FITCHEQUE",
+      description:
+        "Live storefront for curated pre-loved fashion, featuring new arrivals, a product collection, a shopping cart, and customer sign-in. A polished shopping experience centered on giving second-hand pieces a new life.",
+      tags: ["E-commerce", "Pre-loved Fashion", "Online Store"],
+      github: null,
+      demo: "https://fitcheque.store",
+      demoLabel: "Visit Site",
     },
     {
       emoji: "✨",
@@ -22,9 +32,9 @@ export default function Projects() {
 
     {
       emoji: "🌼",
-      title: "Maison Eclair",
+      title: "Maison Éclair",
       description:
-        "An interactive generative art piece — click to place stars, drag between them to draw constellations, with ambient drifting stars and shooting stars streaking through in the background. Built as a canvas/animation showcase, exploring the kind of motion and visual polish used in animated hero sections.",
+        "Editorial-style landing page for a fictional Parisian pâtisserie, featuring its story, pastry menu, location, and hours. A visual design study—not a real bakery or booking service.",
       tags: ["HTML/CSS", "Scroll Animation", "Editorial Design"],
       github: null,
       demo: "/maison-eclair.html",
@@ -33,7 +43,7 @@ export default function Projects() {
       emoji: "☀️",
       title: "Solar Materials Estimator",
       description:
-        "Interactive tool that converts a household's monthly electric bill into a ballpark solar system size — panel count, inverter rating, mounting/cabling estimate, and battery sizing for hybrid setups. Built to walk non-technical clients through a real sizing calculation without needing to understand the math behind it.",
+        "Portfolio-only solar sizing estimator that turns a monthly electric bill and system choices into a rough system size, panel and equipment estimates, and indicative cost range. Estimates are preliminary and require an on-site assessment before purchase.",
       tags: ["JavaScript", "HTML/CSS", "Solar sizing logic"],
       github: null,
       demo: "/solar-estimator.html",
@@ -42,8 +52,8 @@ export default function Projects() {
       emoji: "🏥",
       title: "Clinic Appointment Booking System",
       description:
-        "Online scheduling system for a small dermatology clinic, enabling bookings across 3+ service categories for a 5-person clinic team. Built with React and Node.js/PostgreSQL.",
-      tags: ["React", "Node.js", "PostgreSQL"],
+        "Interactive, multi-step appointment-booking prototype for a fictional dermatology clinic. Visitors choose a visit type and provider, select a date and time, and enter contact details; the demo is not connected to a live clinic.",
+      tags: ["HTML", "CSS", "JavaScript"],
       github: null,
       demo: "/clinic-booking-demo.html",
     },
@@ -51,7 +61,7 @@ export default function Projects() {
       emoji: "📋",
       title: "Client Management System (CRM)",
       description:
-        "Client management dashboard for a fictional events styling studio — searchable client records, a detail drawer with contact info and booking history, and a month-by-month event calendar. Built to demonstrate the same CRM logic used in a real client project, without exposing any private client data.",
+        "Demo CRM dashboard for a fictional styling studio, with searchable client records, a client detail drawer, and an event calendar. It is a portfolio piece, not a real client system.",
       tags: ["JavaScript", "Dashboard UI", "Data Filtering"],
       github: null,
       demo: "/crm-dashboard-demo.html",
@@ -60,7 +70,7 @@ export default function Projects() {
       emoji: "📦",
       title: "Order Management System",
       description:
-        "Order tracking system for a small online reseller, automating order status updates and email notifications — eliminating manual follow-up for each transaction.",
+        "Order-fulfillment dashboard prototype for a fictional online reseller, showing sample orders, buyers, items, tracking codes, and shipment stages. It is a visual workflow demo, not connected to live order data or email notifications.",
       tags: ["JavaScript", "Custom UI", "State Animation"],
       github: null,
       demo: "/order-tracking-demo.html",
@@ -69,8 +79,8 @@ export default function Projects() {
       emoji: "☕",
       title: "Lurk POS System",
       description:
-        "Point-of-sale and inventory system for a cafe — live shared stock across every device, staff PIN login with a full activity log, simulated supplier auto-reordering, and a nightly closing-count reconciliation that flags discrepancies for the owner. Built with a real-time shared database so every sale, restock, and delivery updates instantly everywhere.",
-      tags: ["JavaScript", "Real-time Database", "POS System"],
+        "Cafe point-of-sale and inventory system with order entry, shared stock tracking, staff-attributed activity, supplier-order controls, and closing-count reconciliation. Staff PINs identify who handled each action; they are not a security lock.",
+      tags: ["JavaScript", "Shared Database", "POS System"],
       github: null,
       demo: "/lurk-pos-demo.html",
     },
@@ -130,7 +140,7 @@ export default function Projects() {
                     className="btn btn-accent"
                     style={{ fontSize: "13px", padding: "8px 16px" }}
                   >
-                    Live Demo
+                    {project.demoLabel || "Live Demo"}
                   </a>
                 )}
                 {!project.github && !project.demo && (
