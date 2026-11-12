@@ -1,49 +1,39 @@
 export default function Skills() {
   const categories = [
     {
-      icon: "🌐",
-      title: "Frontend",
-      skills: ["React JS", "Vite", "HTML5", "CSS3", "Tailwind CSS", "Responsive Design"],
+      icon: "💬",
+      title: "Languages",
+      skills: ["JavaScript", "TypeScript", "PHP", "Python", "SQL", "HTML5", "CSS3"],
     },
     {
-      icon: "⚙️",
-      title: "Backend",
-      skills: ["Node.js", "Express", "TypeScript", "PHP", "Laravel", "REST API", "MVC", "JWT Auth"],
+      icon: "🌐",
+      title: "Frontend & Backend",
+      skills: ["React JS", "Tailwind CSS", "Angular (exposure)", "Node.js", "Express.js", "PHP", "Laravel (exposure)", "REST API Design", "MVC Architecture"],
     },
     {
       icon: "🗄️",
       title: "Databases",
-      skills: ["PostgreSQL", "MySQL", "Relational Design", "Parameterized Queries"],
+      skills: ["PostgreSQL", "MySQL", "Supabase", "Real-time Databases", "Relational Database Design", "Parameterized Queries"],
+    },
+    {
+      icon: "🧪",
+      title: "Testing & DevOps",
+      skills: ["Jest", "Postman", "Test-Driven Development", "Git", "GitHub", "Docker", "Podman", "Vercel", "OpenProject", "DevHub"],
     },
     {
       icon: "🤖",
-      title: "AI & LLM",
-      skills: ["Ollama", "NLP Sentiment Analysis", "Prompt Design", "Rule-based Fallback", "Claude (Anthropic)", "GitHub Copilot"],
+      title: "AI & Practices",
+      skills: ["Ollama", "NLP Sentiment Analysis", "Prompt Design", "Agile/Scrum", "Code Review", "JWT Auth", "Zod Validation", "Rate Limiting"],
     },
     {
-      icon: "🛠️",
-      title: "DevOps & Tools",
-      skills: ["Git", "GitHub", "Docker", "Podman", "Postman", "VS Code", "OpenProject"],
+      icon: "📘",
+      title: "Quality & Documentation",
+      skills: ["Unit Testing", "Debugging", "Code Review", "Microsoft Office", "SDLC Docs", "DFDs", "ERDs", "Use Case Diagrams"],
     },
     {
       icon: "🔒",
-      title: "Security & Practices",
-      skills: ["CISDP Certified", "Zod Validation", "Rate Limiting", "SQL Injection Prevention", "Agile/Scrum", "Jest", "Code Review"],
-    },
-    {
-      icon: "☕",
-      title: "Currently Learning",
-      skills: ["Spring Boot", "Java", "Gradle", "JPA", "Apache POI", "OpenPDF"],
-    },
-    {
-      icon: "🌐",
-      title: "Networking",
-      skills: ["Cisco CCNA", "Enterprise Networking", "Security & Automation", "Switching & Routing"],
-    },
-    {
-      icon: "🗣️",
-      title: "Languages",
-      skills: ["Filipino (Native)", "English (Professional)"],
+      title: "Security & Networking",
+      skills: ["CISDP Certified", "Cisco CCNA", "Information Security", "Database Security", "Enterprise Networking", "Security & Automation"],
     },
   ];
 
