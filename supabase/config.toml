@@ -1,0 +1,4 @@
+project_id = "lurk-pos-alerts"
+
+[functions.low-stock-alert]
+verify_jwt = true

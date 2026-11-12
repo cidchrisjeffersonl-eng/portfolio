@@ -11,24 +11,15 @@ export default function Resume() {
         <div className="resume-icon">📄</div>
         <h3>Chris Jefferson L. Cid</h3>
         <p>
-          Junior Software Engineer · Full Stack Developer
+          Full Stack Developer · BSIT Graduate 2026
           <br />
-          CISDP Certified · Cisco CCNA · BSIT Graduate 2026
+          CISDP Certified · Cisco CCNA · DOST Backend Intern
         </p>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-          
-           <a href="/Chris_Jefferson_Cid_Resume.pdf"
-            download
-            className="btn btn-primary"
-          >
+          <a href="/Chris_Jefferson_Cid_Resume.pdf" download className="btn btn-primary">
             Download PDF
           </a>
-          
-            <a href="https://linkedin.com/in/chris-jefferson-cid-5850b2399"
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-outline"
-          >
+          <a href="https://linkedin.com/in/chris-jefferson-cid-5850b2399" target="_blank" rel="noreferrer" className="btn btn-outline">
             View LinkedIn
           </a>
         </div>
@@ -44,12 +35,12 @@ export default function Resume() {
             <div className="timeline-date">Feb – Jun 2026</div>
             <div className="timeline-content">
               <h4>Backend Developer Intern</h4>
-              <span>Department of Science and Technology (DOST) — EIS System · Bicutan, Taguig City</span>
+              <span>Department of Science and Technology (DOST) — EIS Microservices Team · Bicutan, Taguig City</span>
               <p>
-                Built and shipped 8+ RESTful API endpoints for the EIS microservice using
-                Node.js and PostgreSQL. Wrote Jest test suites across 3+ sprint cycles.
-                Worked in Agile/Scrum with daily standups and sprint retrospectives tracked
-                via OpenProject.
+                Implemented and shipped 8+ RESTful API endpoints for the DOST Enterprise Information System (EIS) microservices using Node.js, TypeScript, and PostgreSQL; tested with Postman and managed containers with Podman.
+              </p>
+              <p>
+                Wrote Jest unit test suites covering API endpoints and database query logic for every file created, maintaining coverage across 3+ Agile sprint cycles before each code review submission.
               </p>
             </div>
           </div>
@@ -60,9 +51,48 @@ export default function Resume() {
               <h4>Freelance Full Stack Developer</h4>
               <span>Self-Employed</span>
               <p>
-                Delivered 3 client projects end-to-end: a clinic appointment booking system,
-                a CRM for a local events styling business, and an order management system
-                for an online reseller. Managed full project lifecycle independently.
+                Delivered 3 client web systems independently: gathered requirements, designed the UI, built backend integration, tested, deployed, and handed over to the client. Projects included clinic appointment booking, CRM, and order management systems.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: "60px" }}>
+        <div className="section-label">Projects</div>
+        <h2 className="section-title" style={{ fontSize: "24px", marginBottom: "32px" }}>
+          Selected Work
+        </h2>
+        <div className="timeline">
+          <div className="timeline-item">
+            <div className="timeline-date">2025 – 2026</div>
+            <div className="timeline-content">
+              <h4>Smart Feedback Analytics for Faculty Evaluation</h4>
+              <span>Capstone, Sole Developer · React, Node.js, TypeScript, PostgreSQL, Ollama</span>
+              <p>
+                Faculty evaluation platform with 4 user roles, 6 CRUD modules, and a local-LLM action-plan generator with rule-based fallback. Secured with JWT, Zod, rate limiting, and 7 Jest security tests.
+              </p>
+            </div>
+          </div>
+
+          <div className="timeline-item">
+            <div className="timeline-date">Sep 2026 – Present</div>
+            <div className="timeline-content">
+              <h4>Lurk POS System</h4>
+              <span>Cafe POS and inventory · JavaScript, Real-time Database</span>
+              <p>
+                Live shared stock across devices, staff PIN login with activity log, simulated supplier auto-reordering, and nightly closing-count reconciliation.
+              </p>
+            </div>
+          </div>
+
+          <div className="timeline-item">
+            <div className="timeline-date">Sep 2026 – Present</div>
+            <div className="timeline-content">
+              <h4>Fit Cheque</h4>
+              <span>E-commerce web app · React (Vite), Node.js/Express, Supabase</span>
+              <p>
+                Online store with product catalog, cart, user sign-in/registration, profiles, and an admin dashboard, deployed on Vercel.
               </p>
             </div>
           </div>
@@ -81,8 +111,7 @@ export default function Resume() {
               <h4>BS Information Technology</h4>
               <span>Far Eastern University Roosevelt — Marikina City</span>
               <p>
-                Coursework: Software Engineering, Web Development, Database Management,
-                Systems Analysis, Networking.
+                Dean’s Lister — Second Honors, Second Semester AY 2022-2023 (GPA: 3.800). Coursework included Software Engineering, Web Development, Database Management, Systems Analysis, Computer Networks, and Information Security.
               </p>
             </div>
           </div>
@@ -90,20 +119,10 @@ export default function Resume() {
           <div className="timeline-item">
             <div className="timeline-date">2025</div>
             <div className="timeline-content">
-              <h4>CISDP Certification</h4>
-              <span>East West International Educational Specialist</span>
-              <p>Certified Information Security and Data Privacy Practitioner.</p>
-            </div>
-          </div>
-
-          <div className="timeline-item">
-            <div className="timeline-date">2025</div>
-            <div className="timeline-content">
-              <h4>Cisco CCNA</h4>
-              <span>Cisco Networking Academy</span>
+              <h4>Certifications</h4>
+              <span>East West International Educational Specialist · Cisco Networking Academy</span>
               <p>
-                Enterprise Networking, Security and Automation — Switching, Routing
-                and Wireless Essentials — Introduction to Networks.
+                CISDP — Certified Information Security and Data Privacy Practitioner; CCNA: Enterprise Networking; CCNA: Switching/Routing; CCNAv7: Intro to Networks.
               </p>
             </div>
           </div>
