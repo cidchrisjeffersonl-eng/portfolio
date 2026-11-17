@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Fruit Box (Dark)</title>
+<style>
+  :root {
+    --bg: #101216;
+    --panel: #181b21;
+    --line: #2a2f38;
+    --text: #e6e8ec;
+    --dim: #8a92a0;
+    --accent: #7ee0a1;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-user-select: none; user-select: none; touch-action: none; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 10px; }
+  .bar { width: 100%; max-width: 1000px; display: flex; align-items: center; gap: 16px; }
+  .stat { font-size: 15px; color: var(--dim); white-space: nowrap; }
+  .stat b { color: var(--text); font-size: 20px; font-variant-numeric: tabular-nums; margin-left: 4px; }
+  .time { flex: 1; height: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .time i { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: left; }
+  button { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 14px; font-size: 14px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .wrap { position: relative; width: 100%; max-width: 1000px; }
+  canvas { display: block; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; cursor: crosshair; }
+  .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; background: rgba(16,18,22,.88); border-radius: 12px; text-align: center; padding: 20px; }
+  .overlay.hide { display: none; }
+  .overlay h1 { margin: 0; font-size: 30px; }
+  .overlay p { margin: 0; color: var(--dim); max-width: 420px; line-height: 1.5; }
+  .overlay .big { font-size: 56px; font-weight: 700; color: var(--accent); }
+  .overlay button { background: var(--accent); color: #0b1a10; border: 0; font-weight: 700; font-size: 16px; padding: 12px 28px; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div class="stat">Score<b id="score">0</b></div>
+    <div class="time"><i id="timebar"></i></div>
+    <div class="stat">Best<b id="best">0</b></div>
+    <button id="restart">Restart</button>
+  </div>
+  <div class="wrap">
+    <canvas id="c"></canvas>
+    <div class="overlay" id="overlay">
+      <h1>Fruit Box</h1>
+      <p>Drag a rectangle over apples whose numbers add up to exactly 10. Each apple cleared is 1 point. You have 120 seconds.</p>
+      <button id="start">Start</button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const COLS = 17, ROWS = 10, TOTAL = 120;
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const $ = id => document.getElementById(id);
+  let grid, cell, score, timeLeft, running = false, last = 0;
+  let drag = null; // {x0,y0,x1,y1}
+  let best = 0;
+  try { best = +localStorage.getItem('fruitbox-dark-best') || 0; } catch (e) {}
+  $('best').textContent = best;
+
+  function newGrid() {
+    const g = Array.from({ length: ROWS }, () => Array.from({ length: COLS }, () => 1 + Math.floor(Math.random() * 9)));
+    let sum = g.flat().reduce((a, b) => a + b, 0);
+    // make total a multiple of 10 so the board can be fully cleared in theory
+    while (sum % 10 !== 0) {
+      const r = Math.floor(Math.random() * ROWS), c = Math.floor(Math.random() * COLS);
+      if (g[r][c] < 9) { g[r][c]++; sum++; }
+    }
+    return g;
+  }
+
+  function resize() {
+    const w = cv.parentElement.clientWidth;
+    cell = w / COLS;
+    const h = cell * ROWS;
+    const dpr = window.devicePixelRatio || 1;
+    cv.style.height = h + 'px';
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function selection() {
+    if (!drag) return null;
+    const x0 = Math.min(drag.x0, drag.x1), x1 = Math.max(drag.x0, drag.x1);
+    const y0 = Math.min(drag.y0, drag.y1), y1 = Math.max(drag.y0, drag.y1);
+    const cells = []; let sum = 0;
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const v = grid[r][c]; if (!v) continue;
+      const cx = (c + .5) * cell, cy = (r + .5) * cell;
+      if (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1) { cells.push([r, c]); sum += v; }
+    }
+    return { x0, y0, x1, y1, cells, sum };
+  }
+
+  function apple(cx, cy, rad, v, state) {
+    // body
+    ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+    ctx.fillStyle = state === 'ok' ? '#3fae6a' : state === 'sel' ? '#d9604f' : '#b8443a';
+    ctx.fill();
+    // soft shade
+    ctx.beginPath(); ctx.arc(cx - rad * .3, cy - rad * .3, rad * .45, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,.10)'; ctx.fill();
+    // leaf
+    ctx.beginPath(); ctx.ellipse(cx + rad * .25, cy - rad * 1.02, rad * .3, rad * .14, -.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4f9a62'; ctx.fill();
+    // number
+    ctx.fillStyle = '#fff3ee'; ctx.font = `700 ${rad * 1.05}px system-ui, sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(v, cx, cy + rad * .06);
+  }
+
+  function draw() {
+    if (!grid) return;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    const sel = selection();
+    const picked = new Set(sel ? sel.cells.map(([r, c]) => r * COLS + c) : []);
+    const ok = sel && sel.sum === 10;
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const v = grid[r][c]; if (!v) continue;
+      const isSel = picked.has(r * COLS + c);
+      apple((c + .5) * cell, (r + .55) * cell, cell * .38, v, isSel ? (ok ? 'ok' : 'sel') : '');
+    }
+    if (sel) {
+      ctx.fillStyle = ok ? 'rgba(126,224,161,.16)' : 'rgba(255,255,255,.07)';
+      ctx.strokeStyle = ok ? '#7ee0a1' : 'rgba(255,255,255,.55)';
+      ctx.lineWidth = 2;
+      ctx.fillRect(sel.x0, sel.y0, sel.x1 - sel.x0, sel.y1 - sel.y0);
+      ctx.strokeRect(sel.x0, sel.y0, sel.x1 - sel.x0, sel.y1 - sel.y0);
+      if (sel.cells.length) {
+        ctx.font = '700 15px system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+        const label = 'Sum ' + sel.sum;
+        const tx = Math.min(sel.x0 + 6, cv.clientWidth - 70), ty = Math.max(sel.y0 - 4, 20);
+        ctx.fillStyle = ok ? '#7ee0a1' : '#e6e8ec'; ctx.fillText(label, tx, ty);
+      }
+    }
+  }
+
+  function pos(e) {
+    const b = cv.getBoundingClientRect();
+    return [e.clientX - b.left, e.clientY - b.top];
+  }
+
+  cv.addEventListener('pointerdown', e => {
+    if (!running) return;
+    cv.setPointerCapture(e.pointerId);
+    const [x, y] = pos(e); drag = { x0: x, y0: y, x1: x, y1: y }; draw();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag) return;
+    [drag.x1, drag.y1] = pos(e); draw();
+  });
+  const release = () => {
+    if (!drag) return;
+    const sel = selection(); drag = null;
+    if (sel && sel.sum === 10 && sel.cells.length) {
+      sel.cells.forEach(([r, c]) => grid[r][c] = 0);
+      score += sel.cells.length; $('score').textContent = score;
+    }
+    draw();
+  };
+  cv.addEventListener('pointerup', release);
+  cv.addEventListener('pointercancel', () => { drag = null; draw(); });
+
+  function tick(t) {
+    if (!running) return;
+    const dt = (t - last) / 1000; last = t;
+    timeLeft = Math.max(0, timeLeft - dt);
+    const f = timeLeft / TOTAL;
+    const bar = $('timebar');
+    bar.style.transform = `scaleX(${f})`;
+    bar.style.background = f < .2 ? '#e5655a' : f < .45 ? '#e3b95a' : '#7ee0a1';
+    if (timeLeft <= 0) return end();
+    requestAnimationFrame(tick);
+  }
+
+  function start() {
+    grid = newGrid(); score = 0; timeLeft = TOTAL; drag = null; running = true;
+    $('score').textContent = 0;
+    $('overlay').classList.add('hide');
+    resize();
+    last = performance.now(); requestAnimationFrame(tick);
+  }
+
+  function end() {
+    running = false; drag = null; draw();
+    const isBest = score > best;
+    if (isBest) { best = score; $('best').textContent = best; try { localStorage.setItem('fruitbox-dark-best', best); } catch (e) {} }
+    const o = $('overlay');
+    o.innerHTML = `<h1>Time's up</h1><div class="big">${score}</div><p>${isBest ? 'New best score.' : 'Best: ' + best}</p><button id="again">Play again</button>`;
+    o.classList.remove('hide');
+    $('again').onclick = () => { restoreOverlay(); start(); };
+  }
+
+  function restoreOverlay() { /* overlay is re-hidden by start() */ }
+
+  $('start').onclick = start;
+  $('restart').onclick = start;
+  window.addEventListener('keydown', e => { if (e.key === 'r' || e.key === 'R') start(); });
+  window.addEventListener('resize', resize);
+  grid = newGrid(); resize();
+})();
+</script>
+</body>
+</html>
