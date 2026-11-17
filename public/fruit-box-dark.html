@@ -9,8 +9,8 @@
     --bg: #101216;
     --panel: #181b21;
     --line: #2a2f38;
-    --text: #e6e8ec;
-    --dim: #8a92a0;
+    --text: #f1f3f6;
+    --dim: #b2bac7;
     --accent: #7ee0a1;
   }
   * { box-sizing: border-box; }
@@ -19,12 +19,13 @@
     -webkit-user-select: none; user-select: none; touch-action: none; }
   body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; gap: 10px; }
   .bar { width: 100%; max-width: 1000px; display: flex; align-items: center; gap: 16px; }
-  .stat { font-size: 15px; color: var(--dim); white-space: nowrap; }
-  .stat b { color: var(--text); font-size: 20px; font-variant-numeric: tabular-nums; margin-left: 4px; }
+  .stat { font-size: 17px; color: var(--dim); white-space: nowrap; }
+  .stat b { color: var(--text); font-size: 23px; font-variant-numeric: tabular-nums; margin-left: 4px; }
   .time { flex: 1; height: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
   .time i { display: block; height: 100%; width: 100%; background: var(--accent); transform-origin: left; }
+  .restart-row { width: 100%; max-width: 1000px; display: flex; justify-content: center; }
   button { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
-    padding: 8px 14px; font-size: 14px; cursor: pointer; }
+    padding: 8px 14px; font-size: 16px; cursor: pointer; }
   button:hover { border-color: var(--accent); }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .wrap { position: relative; width: 100%; max-width: 1000px; }
@@ -32,9 +33,9 @@
   .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 10px; background: rgba(16,18,22,.88); border-radius: 12px; text-align: center; padding: 20px; }
   .overlay.hide { display: none; }
-  .overlay h1 { margin: 0; font-size: 30px; }
-  .overlay p { margin: 0; color: var(--dim); max-width: 420px; line-height: 1.5; }
-  .overlay .big { font-size: 56px; font-weight: 700; color: var(--accent); }
+  .overlay h1 { margin: 0; font-size: 36px; }
+  .overlay p { margin: 0; color: var(--dim); font-size: 17px; max-width: 420px; line-height: 1.5; }
+  .overlay .big { font-size: 64px; font-weight: 700; color: var(--accent); }
   .overlay button { background: var(--accent); color: #0b1a10; border: 0; font-weight: 700; font-size: 16px; padding: 12px 28px; }
 </style>
 </head>
@@ -43,7 +44,6 @@
     <div class="stat">Score<b id="score">0</b></div>
     <div class="time"><i id="timebar"></i></div>
     <div class="stat">Best<b id="best">0</b></div>
-    <button id="restart">Restart</button>
   </div>
   <div class="wrap">
     <canvas id="c"></canvas>
@@ -52,6 +52,9 @@
       <p>Drag a rectangle over apples whose numbers add up to exactly 10. Each apple cleared is 1 point. You have 120 seconds.</p>
       <button id="start">Start</button>
     </div>
+  </div>
+  <div class="restart-row">
+    <button id="restart">Restart</button>
   </div>
 
 <script>
@@ -112,7 +115,7 @@
     ctx.beginPath(); ctx.ellipse(cx + rad * .25, cy - rad * 1.02, rad * .3, rad * .14, -.5, 0, Math.PI * 2);
     ctx.fillStyle = '#4f9a62'; ctx.fill();
     // number
-    ctx.fillStyle = '#fff3ee'; ctx.font = `700 ${rad * 1.05}px system-ui, sans-serif`;
+    ctx.fillStyle = '#fffaf7'; ctx.font = `700 ${rad * 1.2}px system-ui, sans-serif`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(v, cx, cy + rad * .06);
   }
@@ -135,10 +138,10 @@
       ctx.fillRect(sel.x0, sel.y0, sel.x1 - sel.x0, sel.y1 - sel.y0);
       ctx.strokeRect(sel.x0, sel.y0, sel.x1 - sel.x0, sel.y1 - sel.y0);
       if (sel.cells.length) {
-        ctx.font = '700 15px system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+        ctx.font = '700 17px system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
         const label = 'Sum ' + sel.sum;
         const tx = Math.min(sel.x0 + 6, cv.clientWidth - 70), ty = Math.max(sel.y0 - 4, 20);
-        ctx.fillStyle = ok ? '#7ee0a1' : '#e6e8ec'; ctx.fillText(label, tx, ty);
+        ctx.fillStyle = ok ? '#7ee0a1' : '#f1f3f6'; ctx.fillText(label, tx, ty);
       }
     }
   }
