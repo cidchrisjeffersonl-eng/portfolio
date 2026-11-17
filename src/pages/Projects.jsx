@@ -84,6 +84,15 @@ export default function Projects() {
       github: null,
       demo: "/lurk-pos-demo.html",
     },
+    {
+      emoji: "🍎",
+      title: "Apple Game Dark Mode",
+      description:
+        "eyes hurting in light mode",
+      tags: ["game"],
+      github: null,
+      demo: "/fruit-box-dark.html",
+    },
   ];
 
   return (
